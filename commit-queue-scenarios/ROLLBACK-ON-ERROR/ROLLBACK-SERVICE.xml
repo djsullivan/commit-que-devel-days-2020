@@ -1,0 +1,8 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <hostname xmlns="http://com/example/hostname">
+    <name>Rollback_error_long_name_123456789</name>
+    <device>r01</device>
+    <device>r02</device>
+    <device>r03</device>
+  </hostname>
+</config>

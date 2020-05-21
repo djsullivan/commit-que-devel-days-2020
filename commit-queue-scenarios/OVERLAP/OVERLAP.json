@@ -1,0 +1,62 @@
+{
+    "name"   : "NSO Commit Queue Overlap",
+    "steps" : [
+       {
+         "name" : "Stop netsim devices",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim stop"
+       },
+       {
+         "name" : "Create Service Instance(A) [r01: 0/3/0/0]",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "TEST-OVERLAP-A.xml"
+       },
+       {
+         "name" : "Commit Changes (A)",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=true,commit-queue-tag=Service (A)"
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },    
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },
+       {
+         "name" : "Add second intf to Service(A) [r01: 0/3/0/1]",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "TEST-OVERLAP-B.xml"
+       },
+       {
+         "name" : "Try to Commit Changes (B) (failure: expected)",
+         "cmd-type" : "commit-fail",
+         "commit" : "commit-queue=async,commit-queue-atomic=true"
+       },       
+       {
+         "name" : "Start netsim devices",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim start"
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait",
+         "cmd"  : "ncs-netsim start"        
+       },
+       {
+         "name" : "Cleanup (delete intf services A&B) ",
+         "cmd-type" : "delete",
+         "cmd"  : "delete",
+         "path" : ["/intf:intf"]
+       },
+       {
+         "name" : "Commit Cleanup Operation(s)",
+         "cmd-type" : "commit"
+       }
+     ]
+}

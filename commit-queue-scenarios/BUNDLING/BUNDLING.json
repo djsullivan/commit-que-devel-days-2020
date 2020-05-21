@@ -1,0 +1,105 @@
+{
+    "name"   : "Bundling Multiple Services in One Transaction",
+    "steps" : [
+       {
+         "name" : "Stop all netsim devices r01-r08",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim stop"
+       },
+       {
+         "name" : "Create Base Cfg Service(s) [r01, r02, r03, r04, r05, r06, r07, r08]",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" : "BASE-CONFIG-SERVICE.xml"
+       },
+       {
+         "name" : "Commit Changes (A)",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=false,commit-queue-error-option=continue-on-error,commit-queue-tag=BCFG (r01-r08)",
+         "ops" : ["gather"]
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },    
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },       
+       {
+         "name" : "Start netsim device(s)",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim start"
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait",
+         "cmd"  : "ncs-netsim start"        
+       },
+       {
+         "name" : "Display Commit Queue Complete",
+         "cmd-type" : "display-cq-complete"         
+       },
+       {
+         "name" : "Verify Commit Queue Error(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Observe if Deployment Errors Occurred"
+       },
+       {
+         "name" : "Recover Failed Device(s) sync-from",
+         "cmd-type" : "recover-failed-devices"
+       },
+       {
+         "name" : "Stop netsim devices r01,r08",
+         "cmd-type" : "cli",
+         "cmd-list"  : ["ncs-netsim stop r01","ncs-netsim stop r08"]
+       },
+       {
+         "name" : "Fixed Failed Service(s) [r01, r08]",
+         "cmd-type" : "load merge",
+         "cmd"  : "replace",
+         "file" : "BASE-CONFIG-SERVICE-RECOVER.xml"
+       },
+       {
+         "name" : "Commit Error Recovery Changes [r01, r08]",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=false,commit-queue-error-option=continue-on-error,commit-queue-tag=BCFG-Recover",
+         "ops" : ["gather"]
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },    
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },       
+       {
+         "name" : "Start netsim device(s)",
+         "cmd-type" : "cli",
+         "cmd-list"  : ["ncs-netsim start r01","ncs-netsim start r08"]
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait"        
+       },
+       {
+         "name" : "Display Commit Queue Complete",
+         "cmd-type" : "display-cq-complete"
+       },
+       {
+         "name" : "Cleanup delete base config service instance(s)",
+         "cmd-type" : "delete",
+         "cmd"  : "delete",
+         "path" : ["/base-config:base-config"]
+       },
+       {
+         "name" : "Commit Cleanup Operation(s)",
+         "cmd-type" : "commit"
+       }
+     ]
+}

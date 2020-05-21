@@ -1,0 +1,43 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint="base-config">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+
+      <name>{/device}</name>
+      <config>
+        
+        <?if {/set-hostname = 'enable'}?>
+            <hostname xmlns="http://tail-f.com/ned/cisco-ios-xr">{/device}__very_long_name</hostname>
+        <?end?>
+
+        <ntp xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <server>
+            <server-list>
+              <name>10.10.1.1</name>
+            </server-list>
+            <server-list>
+              <name>10.11.1.1</name>
+            </server-list>
+            <server-list>
+              <name>10.12.1.1</name>
+            </server-list>
+          </server>
+        </ntp>
+
+        <snmp-server xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <community>
+            <name>public</name>
+          </community>
+        </snmp-server>
+
+        <tacacs-server xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <host>
+            <name>10.12.1.1</name>
+            <port>6000</port>
+          </host>
+        </tacacs-server>
+
+      </config>
+    </device>
+  </devices>
+</config-template>

@@ -1,0 +1,34 @@
+module hostname {
+  namespace "http://com/example/hostname";
+  prefix hostname;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  list hostname {
+    key name;
+
+    uses ncs:service-data;
+    ncs:servicepoint "hostname";
+
+    leaf name {
+      type string;
+    }
+
+    // may replace this with other ways of refering to the devices.
+    leaf-list device {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    // replace with your own stuff here
+    leaf dummy {
+      type inet:ipv4-address;
+    }
+  }
+}

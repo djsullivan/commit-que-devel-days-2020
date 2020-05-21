@@ -1,0 +1,143 @@
+{
+  "nodes": {
+  },
+  "contexts": {
+    "/": {
+      "module": "cliparser-extensions-v11",
+      "namespace": "http://tail-f.com/ned/cliparser_v11",
+      "prefix": "cli",
+      "module_meta": [],
+      "imports": {
+        
+      },
+      "extensions": {
+        "trim-delete-if-match": {
+          "substmts":
+          [
+            [ "argument",
+              "value" ],
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.deleteWith" ]
+          ]
+        },
+        "trim-delete": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.deleteWith" ]
+          ]
+        },
+        "split-chunk": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.splitChunk" ],
+            [ "argument",
+              "value" ]
+          ]
+        },
+        "shutdown-before-edit": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.shutdownBeforeEdit" ],
+            [ "argument",
+              "value" ]
+          ]
+        },
+        "secret": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "both" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.secret" ]
+          ]
+        },
+        "multi-line-banner": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "both" ],
+            [ "cliparser-extensions-v11:state",
+              "multi-line" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.multiLineBanner" ]
+          ]
+        },
+        "globally-unique-value": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match|parent-context-deleted" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.globallyUniqueValue" ],
+            [ "argument",
+              "value" ]
+          ]
+        },
+        "delete-with-default": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.deleteWith" ]
+          ]
+        },
+        "custom-delete": {
+          "substmts":
+          [
+            [ "argument",
+              "value" ],
+            [ "cliparser-extensions-v11:direction",
+              "to-device" ],
+            [ "cliparser-extensions-v11:state",
+              "post-match" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.deleteWith" ]
+          ]
+        },
+        "context-value-inject": {
+          "substmts":
+          [
+            [ "cliparser-extensions-v11:direction",
+              "from-device" ],
+            [ "cliparser-extensions-v11:state",
+              "enter-context" ],
+            [ "cliparser-extensions-v11:java-callback-method",
+              "com.tailf.packages.ned.nedcom.NedComCliExtensions.contextValueInject" ],
+            [ "argument",
+              "value" ]
+          ]
+        }
+      },
+      "children": []
+    }
+  },
+  "types": {
+    
+  }
+}

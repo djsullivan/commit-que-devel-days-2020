@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | VRF</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        VRF Service
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">vrf-service</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="row">
+          <div class="col-md-6 col-sm-6 col-xs-12">
+             <!-- Onboarding Statistics -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Progress</h3>
+
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                   <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+              </div>
+             <div class="box-body">
+               <canvas id="pieChart" style="height:150px"></canvas>
+             </div>
+            <!-- /.box-body -->
+            </div>
+          </div>
+
+          <!-- Onboarding Statistics -->
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="box box-info">
+              <div class="box-header with-border">
+                <h3 class="box-title">Statistics</h3>
+
+                <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+              </div>
+              <div class="box-body">
+                <div class="table-responsive">
+                  <table class="table no-margin">
+                    <thead>
+                      <tr>
+                       <th>Name</th>
+                       <th>Count</th>
+                     </tr>
+                    </thead>
+                    <tbody>
+                      {% for stat,v in vrfs.items() %}
+                       <tr>
+                         <td>{{stat}}</td>
+                         <td>{{ v }}</td>
+                       </tr>  
+                      {% endfor %}                 
+                    </tbody>
+                  </table>
+                </div>
+              <!-- /.box-body -->
+              </div>
+            </div>
+          </div>
+          </div>
+          <!-- /.box -->
+          <div class="box">
+            <div class="box-header with-border" >
+              <h3 class="box-title"></h3>
+               <div id="buttons">
+                <button type="button" id="Load" data-target="#vrfLoadModal" data-toggle="modal" data-toggle="tooltip" title="Load VRF Service Data" class="btn bg-red">Load Inventory Data</button>
+                <button type="button" class="btn btn-info" data-target="#vrfOnboardCreateModal" data-toggle="modal" title="Execute Create">Create Services</button>
+               <button type="button" id="Reconcile" data-target="#vrfOnboardReconcileModal" class="btn btn-success" data-toggle="modal" title="Execute Reconcile">Service Reconcile</button>
+              <button type="button" id="NetReconcile" data-target="#vrfOnboardNetReconcileModal" class="btn btn-warning" data-toggle="modal" title="Execute Reconcile">Network Reconcile</button>
+              <button type="button" id="NetReconcile" data-target="#vrfOnboardNetDiscoverModal" class="btn bg-light-blue" data-toggle="modal" title="Execute Reconcile">Network Discover</button>
+              <button type="button" id="Save" data-target="#vrfSaveModal" data-toggle="modal" data-toggle="tooltip" title="Save VRF Service Data" class="btn bg-red">Save Inventory Data</button>
+            </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="table-responsive">
+              <table id="vrfOnboardTable" class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                  <th>Actions</th>
+                  <th>State</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Route Distinguisher</th>
+                  <th>Device</th>
+                  <th>Import Policy</th>
+                  <th>Import RT</th>
+                  <th>Export Policy</th>
+                  <th>Export RT</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <form  action="/devices/actions" method='POST' role="form" id="devices">
+                    {% for vrf,v in vrfd.items() %}
+                     <tr>
+                       <td>
+                        <button type="submit" id="issueReconcile" style="border:0px solid black; background-color: transparent;" data-target="#onboardActionsModal" data-toggle="modal" class="execute-reconcile btn btn-default btn-transparent btn-xs">
+                           <div class="hidden hidden_vrf_name">{{ v['name'] }}</div>
+                        <i class="fa fa-gear"></i>
+                        </button>
+                       </td>
+                       {% if "Failed" == v['state'] %}
+                       <td><span class="label label-danger">{{ v['state'] }}</span></td>
+                       {% elif "Reconciled" == v['state'] %}
+                        <td><span class="label label-success">{{ v['state'] }}</span></td>
+                       {% elif "Discovered"  == v['state'] %}
+                       <td><span class="label bg-light-blue">{{ v['state'] }}</span></td>
+                       {% elif "Created"  == v['state'] %}
+                       <td><span class="label label-info">{{ v['state'] }}</span></td>
+                       {% else %}
+                        <td>{{ v['state'] }}</td>
+                       {% endif %}
+                       <td>{{ v['name'] }}</td>
+                       <td>{{ v['description'] }}</td>
+                       <td>{{ v['route-distinguisher'] }}</td>
+                       {% for dev in v['devices'][0:1] %}
+                          <td> {{ v['device-list'] }} </td>
+                          <td> {{ dev['import-route-policy'] }} </td>
+                          <td> {{ dev['import-route-target'] }} </td>
+                          <td> {{ dev['export-route-policy'] }} </td>
+                          <td> {{ dev['export-route-target'] }} </td>
+                       {% endfor %}
+                     </tr>
+                   {% endfor %}
+                   </form>
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <div class="vrfSaveModal">
+        <div class="modal modal-primary" id="vrfSaveModal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form roll="form" id="vrfSaveModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Save VRF Instance(s)</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>File Name</label>
+                  <div class="input-group">
+                    <input type="text" id="sfilename" value="vrf.xlsx" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Sheet Name</label>
+                  <div class="input-group">
+                    <input type="text" id="ssheetname" value="Results" class="form-control">
+                  </div>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save Inventory Data</button> 
+                  <button type="button" id="vrfSaveModalClose" data-dismiss="modal" id="vrfSaveModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="vrfLoadModal">
+        <div class="modal modal-primary" id="vrfLoadModal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form roll="form" id="vrfLoadModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Load VRF Instance(s)</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>File Name</label>
+                  <div class="input-group">
+                    <input type="text" id="filename" value="vrf.xlsx" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Sheet Name</label>
+                  <div class="input-group">
+                    <input type="text" id="sheetname" value="services" class="form-control">
+                  </div>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Load</button> 
+                  <button type="button" id="vrfLoadModalClose" data-dismiss="modal" id="vrfLoadModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+      <div class="vrfOnboardCreateModal">
+        <div class="modal modal-primary" id="vrfOnboardCreateModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="vrfOnboardCreateModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Create VRF Instances</h4>
+              </div>
+              <div class="modal-body">
+                 <div id="createSpin" class="overlay" style="display:none; position:fixed; left:50%">
+                    <i class="fa fa-refresh fa-spin fa-2x"></i>
+                 </div>
+                 <div id="createResults" style="display:none;">
+                  <pre class="prettyprint pre-scrollable">
+                     <span class="create-results" style="font-size: 11px">
+   
+                     </span>
+                  </pre>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Create</button> 
+                  <button type="button" id="vrfOnboardCreateModalClose" data-dismiss="modal" id="vrfOnboardCreateModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>  
+
+      <div class="vrfOnboardReconcileModal">
+        <div class="modal modal-primary" id="vrfOnboardReconcileModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="vrfOnboardReconcileModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Reconcile VRF Instances</h4>
+              </div>
+              <div class="modal-body">
+                 <div id="reconcileSpin" class="overlay" style="display:none; position:fixed; left:50%">
+                    <i class="fa fa-refresh fa-spin fa-2x"></i>
+                 </div> 
+                 <div id="reconcileResults" style="display:none;">         
+                    <pre class="prettyprint pre-scrollable">
+                      <span class="reconcile-results" style="font-size: 11px">
+   
+                      </span>
+                    </pre>
+                 </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Reconcile</button> 
+                  <button type="button" id="vrfOnboardReconcileModalClose" data-dismiss="modal" id="vrfOnboardReconcileModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>  
+
+      <div class="vrfOnboardNetReconcileModal">
+        <div class="modal modal-primary" id="vrfOnboardNetReconcileModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="vrfOnboardNetReconcileModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Network Reconcile VRF Instance(s)</h4>
+              </div>
+              <div class="modal-body">
+                 <div id="reconcileNetSpin" class="overlay" style="display:none; position:fixed; left:50%">
+                    <i class="fa fa-refresh fa-spin fa-2x"></i>
+                 </div>                 
+                 <div id="reconcileNetResults" style="display:none;">
+                    <pre class="prettyprint pre-scrollable">
+                      <span class="net-reconcile-results" style="font-size: 11px">
+   
+                      </span>
+                   </pre>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" id="vrfReconcileSingle" class="btn btn-default pull-left">Network Reconcile</button> 
+                  <button type="button" id="vrfOnboardNetReconcileModalClose" data-dismiss="modal" id="vrfOnboardNetReconcileModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="vrfOnboardNetDiscoverModal">
+        <div class="modal modal-primary" id="vrfOnboardNetDiscoverModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="vrfOnboardNetDiscoverModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Network Discover VRF Instance(s)</h4>
+              </div>
+              <div class="modal-body">
+                 <div id="discoverSpin" class="overlay" style="display:none; position:fixed; left:50%">
+                    <i class="fa fa-refresh fa-spin fa-2x"></i>
+                 </div>                  
+                <div id="discoverResults" style="display:none;">
+                  <pre class="prettyprint pre-scrollable">
+                     <span class="discover-results" style="font-size: 11px">
+   
+                     </span>
+                  </pre>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Discover</button> 
+                  <button type="button" id="vrfOnboardNetReconcileModalClose" data-dismiss="modal" id="vrfOnboardNetReconcileModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboardActionsModal">
+        <div class="modal modal-primary" id="onboardActionsModal" tabindex=-1>
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Action Results</h4>
+              </div>
+              <form  role="form" id="onBoardActionsModal">
+              <div class="modal-body ">
+                 <pre class="prettyprint pre-scrollable">
+                    <span class="action-results" style="font-size: 11px">
+   
+                    </span>
+                 </pre>
+                 <div class="form-group">
+                    <label>VRF Name</label>
+                    <div class="input-group">
+                      <input type="text" id="vrf_name" class="form-control" style="width: 100%;">
+                    </div>
+                 </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" id="dryReconcile" class="btn btn-default pull-left">Reconcile Dry Run</button>
+                  <button type="submit" id="forceReconcile" class="btn btn-danger pull-left">Force Reconcile</button>
+                  <button type="submit" id="getConfiguration" class="btn btn-info pull-left">Service Configuration</button>
+                  <button type="submit" id="getModifications" class="btn btn-warning pull-left">Service Modifications</button>
+                  <button type="button" id="onboardActionsClose" data-dismiss="modal" id="onboardActionsClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+
+    var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
+    var pieChart = new Chart(pieChartCanvas);
+    var PieData = [
+      {
+        value: {{ vrfs['Discovered']}},
+        color: "#3c8dbc",
+        highlight: "#3c8dbc",
+        label: "Discovered"
+      },
+      {
+        value: {{ vrfs['Failed']}},
+        color: "#f56954",
+        highlight: "#f56954",
+        label: "Failed"
+      },
+      {
+        value: {{vrfs['Reconciled']}},
+        color: "#00a65a",
+        highlight: "#00a65a",
+        label: "Reconciled"
+      },
+      {
+        value: {{ vrfs['Created']}},
+        color: "#00c0ef",
+        highlight: "#00c0ef",
+        label: "Created"
+      },
+      {
+        value: {{vrfs['Unknown']}},
+        color: "#d2d6de",
+        highlight: "#d2d6de",
+        label: "Unknown"
+      }
+    ];
+    var pieOptions = {
+      //Boolean - Whether we should show a stroke on each segment
+      segmentShowStroke: true,
+      //String - The colour of each segment stroke
+      segmentStrokeColor: "#fff",
+      //Number - The width of each segment stroke
+      segmentStrokeWidth: 2,
+      //Number - The percentage of the chart that we cut out of the middle
+      percentageInnerCutout: 50, // This is 0 for Pie charts
+      //Number - Amount of animation steps
+      animationSteps: 100,
+      //String - Animation easing effect
+      animationEasing: "easeOutBounce",
+      //Boolean - Whether we animate the rotation of the Doughnut
+      animateRotate: true,
+      //Boolean - Whether we animate scaling the Doughnut from the centre
+      animateScale: false,
+      //Boolean - whether to make the chart responsive to window resizing
+      responsive: true,
+      // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+      maintainAspectRatio: true,
+    };
+    //Create pie or douhnut chart
+    // You can switch between pie and douhnut using the method below.
+    pieChart.Doughnut(PieData, pieOptions);
+
+
+  $("#vrfOnboardTable").DataTable({
+      lengthMenu:[[200, 40, 50, -1], [200, 40, 50, "All"]],
+  });
+ 
+  $('#onboardActionsModal').on('hidden.bs.modal', function () { 
+    location.reload();
+  });
+
+  $('#vrfOnboardCreateModal').on('submit', function(event) {
+       $('#createSpin').show();
+       $("#createResults").hide();
+       $.ajax({
+         data : {
+      },
+      type : 'POST',
+      url : '/vrf-service/onboard-create'
+    })
+    .done(function(data) {
+      $('#createSpin').hide();
+      dataDisplay = "\n" + data.status + data.message
+      $("#createResults").show();
+      $(".create-results").html(dataDisplay);
+    });
+    event.preventDefault();
+  });
+
+  $('#vrfOnboardCreateModal').on('hidden.bs.modal', function () {
+    window.location.reload(true);
+  })
+
+  $('#vrfOnboardReconcileModal').on('submit', function(event) {
+      $('#reconcileSpin').show();
+       $.ajax({
+         data : {
+          'reconcile' : 'all'
+      },
+      type : 'POST',
+      url : '/vrf-service/onboard-reconcile'
+    })
+    .done(function(data) {
+      dataDisplay = "\n" + data.status + data.message
+      $('#reconcileSpin').hide();
+      $("#reconcileResults").show();
+      $(".reconcile-results").html(dataDisplay);
+    });
+    event.preventDefault();
+  });
+
+  $('#vrfOnboardReconcileModal').on('hidden.bs.modal', function () {
+    window.location.reload(true);
+  })
+
+  $('#vrfOnboardNetReconcileModal').on('submit', function(event) {
+       $('#reconcileNetSpin').show();
+       $.ajax({
+         data : {
+          'net-reconcile' : 'all'
+      },
+      type : 'POST',
+      url : '/vrf-service/network-reconcile'
+    })
+    .done(function(data) {
+      $('#reconcileNetSpin').hide();
+      $("#reconcileNetResults").show();
+      dataDisplay = "\n" + data.status + data.message
+      $(".net-reconcile-results").html(dataDisplay);
+    });
+    event.preventDefault();
+  });
+  $('#vrfOnboardNetReconcileModal').on('hidden.bs.modal', function () {
+    window.location.reload(true);
+  })
+
+  $('#vrfOnboardNetDiscoverModal').on('submit', function(event) {
+       $('#discoverSpin').show();
+       $.ajax({
+         data : {
+          'net-reconcile' : 'all'
+      },
+      type : 'POST',
+      url : '/vrf-service/network-discover'
+    })
+    .done(function(data) {
+      $('#discoverSpin').hide();
+      $("#discoverResults").show();
+      dataDisplay = "\n" + data.status + data.message
+      $(".discover-results").html(dataDisplay);
+    });
+    event.preventDefault();
+  });
+  $('#vrfOnboardNetDiscoverModal').on('hidden.bs.modal', function () {
+    window.location.reload(true);
+  })
+
+  $('#vrfSaveModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'file' : $('#sfilename').val(),
+           'sheet' : $('#ssheetname').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/save'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#vrfLoadModal').modal('hide')
+      }
+      else {
+
+        $('#vrfSaveModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('#vrfLoadModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'file' : $('#filename').val(),
+           'sheet' : $('#sheetname').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/load'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#vrfLoadModal').modal('hide')
+      }
+      else {
+
+        $('#vrfLoadModal').modal('hide');
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('.execute-reconcile').click(function(event) {
+    vrf = $(this).find(".hidden_vrf_name").html();
+    $('#onboardActionsModal  input[id=vrf_name]').val(vrf);
+    $(".action-results").html(""); 
+  });
+
+  $('#dryReconcile').on('click', function(event) {
+       
+       $.ajax({
+         data : {
+           'vrf' : $('#vrf_name').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/dry-reconcile'
+    })
+    .done(function(data) {
+        
+        dataDisplay = "\n" + data.result;
+        $(".action-results").html(dataDisplay); 
+    });
+    event.preventDefault();
+  });
+
+  $('#forceReconcile').on('click', function(event) {
+       
+       $.ajax({
+         data : {
+           'vrf' : $('#vrf_name').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/force-reconcile'
+    })
+    .done(function(data) {
+        
+        dataDisplay = "\n" + data.result;
+        $(".action-results").html(dataDisplay);
+    });
+    event.preventDefault();
+  });
+
+
+  $('#getModifications').on('click', function(event) {
+       
+       $.ajax({
+         data : {
+           'vrf' : $('#vrf_name').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/get-modifications'
+    })
+    .done(function(data) {
+        
+        dataDisplay = "\n" + data.result;
+        $(".action-results").html(dataDisplay); 
+    });
+    event.preventDefault();
+  });
+
+  $('#getConfiguration').on('click', function(event) {
+       
+       $.ajax({
+         data : {
+           'vrf' : $('#vrf_name').val()
+      },
+      type : 'POST',
+      url : '/vrf-service/get-configuration'
+    })
+    .done(function(data) {
+        
+        dataDisplay = "\n" + data.result;
+        $(".action-results").html(dataDisplay); 
+    });
+    event.preventDefault();
+  });
+
+{% endblock %}
+
+

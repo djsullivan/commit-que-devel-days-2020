@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | Devices</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        Device Management
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">Devices</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+          <div class="box">
+            <div class="box-header with-border" >
+              <h3 class="box-title"></h3>
+              <div class="btn-group pull-center">
+                <button type="button" data-target="#devAddModal" data-toggle="modal" data-toggle="tooltip" title="Add device" class="btn btn-default" title="Add device(s)"><i class="fa fa-plus"></i></button>
+                <button type="button" class="btn btn-default" data-toggle="tooltip" title="Remove device(s)"><i class="fa fa-minus"></i></button>
+
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-toggle="tooltip" title="Add device(s)" >
+                     <i class="fa fa-gears">  </i><span class="caret"></span>
+                  </button>
+                      <ul id="devaction" class="dropdown-menu">
+                          <li><a href="#">sync-from</a></li>
+                          <li><a href="#">check-sync</a></li>
+                          <li><a href="#">compare-config</a></li>
+                          <li><a href="#">fetch-ssh-host-keys</a></li>
+                          <li><a href="#">clear-trace</a></li>
+                          <li><a href="#">sync-to</a></li>
+                      </ul>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="Devices" class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                  <th>
+                     <div class="form-group">
+                         <input type="checkbox" class="pull-right" unchecked id="selectAll" name="devices" value="all">
+                     </div> Select
+                  </th>
+                  <th>Device Name</th>
+                  <th>Address</th>
+                  <th>Port</th>
+                  <th>Admin State</th>
+                  <th>Model</th>
+                  <th>Name</th>
+                  <th>Version</th>
+                  <th>Serial Number</th>
+                  <th>NED</th>
+                  <th>Authgroup</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <form  action="/devices/actions" method='POST' role="form" id="devices">
+                   {% for dev in devices %}
+                     <tr>
+                       <td>
+                         <div class="form-group">
+                         <input type="checkbox" class="pull-right" unchecked id="chkboxName" name="devices" value="{{dev['name'] }}">
+                       </div>
+                     </td>
+                     <td>{{ dev['name'] }}</td>
+                     <td>{{ dev['address'] }}</td>
+                     <td>{{ dev['port'] }}</td>
+
+                     {% if "unlocked" in dev['state/admin-state'] %}
+                        <td><span class="label label-success">{{ dev['state/admin-state'] }}</td>
+                     {% else %}
+                        <td>{{ dev['state/admin-state'] }}</td>
+                     {% endif %}
+                     <td>{{ dev['platform/model'] }}</td>
+                     <td>{{ dev['platform/name'] }}</td>
+                     <td>{{ dev['platform/version'] }}</td>
+                     <td>{{ dev['platform/serial-number'] }} </td>
+                     <td>{{ dev['device-type'] }}</td>
+                     <td>{{ dev['authgroup']}}</td>
+                   </tr>
+                   {% endfor %}
+                   </form>
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+
+      <div class="devAddModal">
+        <div class="modal modal-primary" id="devAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+          
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Managed Device</h4>
+              </div>
+              
+              <div class="modal-body">
+
+                <form  role="form" id="addDevice">
+                <div class="form-group">
+                  <label>Device Name:</label>
+                  <div class="input-group">
+                    <input type="text" id="name" class="form-control">
+                  </div>
+                </div>
+               
+                <!-- IP mask -->
+                <div class="form-group">
+                  <label>Device IP Address:</label>
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-laptop"></i>
+                    </div>
+                    <input type="text" id="address"class="form-control" data-inputmask="'alias': 'ip'" data-mask>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Port:</label>
+                  <div class="input-group">
+                    <input type="text" id="port" class="form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Authgroup:</label>
+                  <div class="input-group">
+                    <input type="text" id="authgroup" class="form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                     <label>Admin State:</label>
+                   <select class="form-control select2" id="admin" style="width: 50%;">
+                      <option selected="selected">unlocked</option>
+                      <option>southbound-locked</option>
+                      <option>locked</option>
+                   </select>
+                </div>
+
+                <div class="form-group">
+                     <label>Device Type:</label>
+                   <select class="form-control select2" id="devtype" style="width: 50%;">
+                      <option selected="selected">netconf</option>
+                      {% for key in nedinfo  %}
+                        <option>{{key}}</option>
+                      {% endfor %}
+                   </select>
+                </div>
+               
+                <!-- /.input group -->
+               <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+              </div>
+              </form>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+      </div>
+      <!-- /.dev-add-modal -->
+    
+      <div class="actionModal">
+        <div class="modal" id="actionModal" tabindex=-1>
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Action Results</h4>
+              </div>
+              <div class="modal-body ">
+                 <div id="actionSpin" class="overlay" style="position:fixed; left:50%">
+                    <i class="fa fa-refresh fa-spin fa-2x"></i>
+                 </div>
+                 <div id="actionResults">
+                 </div>
+                 <div id='syncResult'>
+                    <table id="example1" class="table table-sm table-bordered table-striped">
+                      <thead>
+                        <tr>
+                         <th>Device</th>
+                         <th>Result</th>
+                         <th>Info</th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-default" id="syncResultInfo">
+                   
+                      </tbody>
+                   </table>
+                 </div>
+                 <div id='compareCfgResult'>
+                  <pre class="prettyprint pre-scrollable">
+                     <span class="compare-results" style="font-size: 11px">
+   
+                     </span>
+                 </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" id="actionClose" data-dismiss="modal"  class="btn btn-default pull-right">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+  
+  $("#Devices").DataTable({
+      lengthMenu:[[15, 25, 50, -1], [15, 25, 50, "All"]],
+  });
+
+
+  $('#selectAll').click(function(e){
+    var table= $(e.target).closest('table');
+    $('td input:checkbox',table).attr('checked',e.target.checked);
+  });
+
+  $(".dropdown-menu li a").click(function(){
+     var selText = $(this).text();
+     var selRows = $(".table input[type=checkbox]:checked").map(function () { return this.value;}).get().join(",");
+     $('#actionModal').modal('show');
+     $('#compareCfgResult').hide();
+     $('#actionSpin').show();
+     $('#syncResult').hide();
+      $.ajax({
+         data : {
+           action : selText,
+           devices: selRows,
+      },
+      type : 'POST',
+      url : '/devices/action'
+    })
+    .done(function(data) {
+      $('#actionSpin').hide();
+      if (selText == "compare-config") {
+          $('#compareCfgResult').show();
+          $('.compare-results').html(data.result);
+      }
+      else {
+        $('#syncResult').show();
+        $('#compareCfgResult').hide();
+        $('.compare-results').html();
+        $('#syncResultInfo').html(data.result);
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('form').on('submit', function(event) {
+       $.ajax({
+         data : {
+           name : $('#name').val(),
+           address : $('#address').val(),
+           port : $('#port').val(),
+           authgroup : $('#authgroup').val(),
+           devtype : $('#devtype').val(),
+           state : $('#admin').val()
+      },
+      type : 'POST',
+      url : '/devices/add-device'
+    })
+    .done(function(data) {
+      
+      if (data.error) {
+
+        $('#commit')
+      }
+      else {
+        $('#devAddModal').modal('hide')
+        $('#').button('unhide')
+      }
+
+    });
+
+    event.preventDefault();
+  });
+
+{% endblock %}
+
+

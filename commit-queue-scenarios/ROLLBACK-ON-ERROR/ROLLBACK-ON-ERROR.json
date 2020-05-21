@@ -1,0 +1,62 @@
+{
+    "name"   : "NSO Commit Queue Rollback",
+    "steps" : [
+       {
+         "name" : "Stop netsim device r01",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim stop r01"
+       },
+       {
+         "name" : "Create Hostname Service Instance(A) [r01, r02, r03]",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "ROLLBACK-SERVICE.xml"
+       },
+       {
+         "name" : "Commit Changes (A)",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=true,commit-queue-error-option=rollback-on-error,commit-queue-tag=Service (A)",
+         "ops" : ["gather"]
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },    
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },       
+       {
+         "name" : "Start netsim device r01",
+         "cmd-type" : "cli",
+         "cmd"  : "ncs-netsim start r01"
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait",
+         "cmd"  : "ncs-netsim start"        
+       },
+       {
+         "name" : "Display Commit Queue Complete",
+         "cmd-type" : "display-cq-complete"         
+       },
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Observe if Rollback has occurred"
+       }, 
+       {
+         "name" : "Cleanup (delete hostname service instance) ",
+         "cmd-type" : "delete",
+         "cmd"  : "delete",
+         "path" : ["/intf:intf"]
+       },
+       {
+         "name" : "Commit Cleanup Operation(s)",
+         "cmd-type" : "commit"
+       }
+     ]
+}

@@ -1,0 +1,31 @@
+module base-config {
+  namespace "http://com/example/baseconfig";
+  prefix base-config;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  list base-config {
+    key device;
+
+    uses ncs:service-data;
+    ncs:servicepoint "base-config";
+
+    leaf device {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+    leaf set-hostname {
+      type enumeration {
+         enum enable;
+         enum disable;
+      }
+      default "disable";
+    }
+  }
+}

@@ -1,0 +1,14 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <intf xmlns="http://com/example/intf">
+    <name>TEST-OVERLAP</name>
+    <device>r01</device>
+    <interfaces>
+      <id>0/3/0/0</id>
+      <description>TEST-OVERLAP-A</description>
+    </interfaces>
+    <interfaces>
+      <id>0/3/0/1</id>
+      <description>TEST-OVERLAP-B</description>
+    </interfaces>
+  </intf>
+</config>

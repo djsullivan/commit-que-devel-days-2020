@@ -1,0 +1,71 @@
+{
+    "name"   : "Async and Sync Commit Queue API",
+    "steps" : [
+       {
+         "name" : "Stop netsim devices r01, r02",
+         "cmd-type" : "cli",
+         "cmd-list" : ["ncs-netsim stop r01", "ncs-netsim stop r02"]
+       },
+       {
+         "name" : "Create Service Instance A",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "INTF-SERVICE-A.xml"
+       },
+       {
+         "name" : "Commit Changes (A) SYNC",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=sync,commit-queue-timeout=20,commit-queue-atomic=true,commit-queue-tag=Service (A)",
+         "ops" : ["gather"]
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },
+       {
+         "name" : "Create Service Instance B",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "INTF-SERVICE-B.xml"
+       },
+       {
+         "name" : "Commit Changes (B) ASYNC",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=true,commit-queue-tag=Service (B)",
+         "ops" : ["gather"]
+       },       
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },
+       {
+         "name" : "Start netsim devices",
+         "cmd-type" : "cli",
+         "cmd-list"  : ["ncs-netsim start r01", "ncs-netsim start r02"]
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait"    
+       },
+       {
+         "name" : "Cleanup (delete intf services A&B) ",
+         "cmd-type" : "delete",
+         "cmd"  : "delete",
+         "path" : ["/intf:intf"]
+       },
+       {
+         "name" : "Commit Cleanup Operation(s)",
+         "cmd-type" : "commit"
+       }
+     ]
+}

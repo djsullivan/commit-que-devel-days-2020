@@ -1,0 +1,28 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r01</device>
+    <set-hostname>enable</set-hostname>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r02</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r03</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r04</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r05</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r06</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r07</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r08</device>
+    <set-hostname>enable</set-hostname>
+  </base-config>
+</config>

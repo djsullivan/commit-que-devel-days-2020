@@ -1,0 +1,865 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | Cable Services</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        Cable Services
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">cable-service</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+
+      <div class="col-md-12">
+        <div class="nav-tabs-custom">
+          <ul class="nav nav-tabs">
+              <li><a href="#RPD" data-toggle="tab">RPD</a></li>
+             <li><a href="#ACL" data-toggle="tab">ACL</a></li>
+             <li><a href="#QOS" data-toggle="tab">QoS</a></li>
+          </ul>
+ 
+        <div class="tab-content">
+          <div class="active tab-pane" id="RPD">
+
+             <!-- TABLE: VPNs -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                   <h3 class="box-title">RPD Connectivity Service</h3>
+                  <div class="box-tools pull-right">
+                     <button type="button" data-target="#rpdAddModal" data-toggle="modal" class="create-rpd btn btn-default">New RPD</button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                   <div class="table-responsive">
+                    <table id="vpnTable" class="table table-bordered">
+                      <thead>
+                        <tr>
+                           <th data-field="state" data-checkbox="true"></th>
+                           <th>RPD Mac Address</th>
+                           <th>Site</th>
+                           <th>State</th>
+                           <th>CCAP</th>
+                           <th>Leaf Switch</th>
+                           <th>Leaf Interface</th>
+                           <th>IPv4 Address</th>
+                           <th>IPv4 Mask</th>
+                           <th>IPv6 Prefix</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                       {% for rpd in rpds %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="rpdDelete" style="border:0px solid black; background-color: transparent;" class="delete-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                 <div class="hidden rpd_del_name">{{ rpd['rpd-mac-address'] }}</div>
+                               </button>
+                               <button type="submit" id="rpdEdit" style="border:0px solid black; background-color: transparent;" data-target="#rpdAddModal" data-toggle="modal" class="modify-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden rpd_mac">{{ rpd['rpd-mac-address'] }}</div>
+                                 <div class="hidden rpd_site">{{ rpd['site'] }}</div>
+                                 <div class="hidden rpd_state">{{ rpd['state'] }}</div>
+                                 <div class="hidden rpd_ccap">{{ rpd['ccap'] }}</div>
+                                 <div class="hidden rpd_cin_leaf">{{ rpd['cin-leaf'] }}</div>
+                                 <div class="hidden rpd_cin_leaf_interface">{{ rpd['cin-leaf-interface'] }}</div>
+                                 <div class="hidden rpd_cin_leaf_ipv4_addr">{{ rpd['cin-leaf-ip/ipv4/address'] }}</div>
+                                 <div class="hidden rpd_cin_leaf_ipv4_mask">{{ rpd['cin-leaf-ip/ipv4/mask'] }}</div>
+                                 <div class="hidden rpd_cin_leaf_ipv6_prefix">{{ rpd['cin-leaf-ip/ipv6/prefix'] }}</div>
+
+                               </button>
+                                <button type="submit" id="rpdVerfiy" style="border:0px solid black; background-color: transparent;" data-target="#rpdVerifyModal" data-toggle="modal" class="verify-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-check-square-o"></i>
+                                 <div class="hidden rpd_verify_mac">{{ rpd['rpd-mac-address'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ rpd['rpd-mac-address'] }}</td>
+                          <td>{{ rpd['site'] }}</td>
+                          <td>{{ rpd['state'] }}</td>
+                          <td>{{ rpd['ccap'] }}</td>
+                          <td>{{ rpd['cin-leaf']}}</td>
+                          <td>{{ rpd['cin-leaf-interface']}}</td>
+                          <td>{{ rpd['cin-leaf-ip/ipv4/address']}}</td>
+                          <td>{{ rpd['cin-leaf-ip/ipv4/mask']}}</td>
+                          <td>{{ rpd['cin-leaf-ip/ipv6/prefix']}}</td>
+                        </tr>
+                       {% endfor %}
+                     </tbody>
+                    </table>
+                  </div>
+                  <!-- /.table-responsive -->
+                 </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+             
+                </div>
+                <!-- /.box-footer -->
+              </div>
+           </div>
+           <div class="tab-pane" id="ACL">
+         
+              <!-- TABLE: NSO Packages -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">ACL Service</h3>
+
+                  <div class="box-tools pull-right">
+                     <button type="button" data-target="#aclAddModal" data-toggle="modal" class="create-acl btn btn-default">New ACL</button>
+                     <button type="button" data-target="#aclAddModal" data-toggle="modal" class="btn btn-warning">re-deploy ACL</button>
+                  </div>
+               </div>
+               <!-- /.box-header -->
+               <div class="box-body">
+                 <div class="table-responsive">
+                   <table class="table no-margin">
+                     <thead>
+                        <tr>
+                          <th>Edit</th>
+                          <th>ACL Name</th>
+                          <th>IPv4/IPv6</th>
+                          <th>Rule Number</th>
+                          <th>ACL</th>
+                          <th>Device</th>
+                          <th>Interface</th>
+                          <th>Direction</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for acl in acls %}
+                         <tr class="clickable-row">
+                          <td>
+                            <button type="submit" id="aclDelete" style="border:0px solid black; background-color: transparent;" class="delete-acl btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                              <div class="hidden acl_del_name">{{ acl['name'] }}</div>
+                            </button>
+                            <button type="submit" id="modify-acl" style="border:0px solid black; background-color: transparent;" data-target="#aclAddApplyModal" data-toggle="modal" class="modify-acl btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                              <div class="hidden acl_name">{{ acl['name'] }}</div>
+                              <div class="hidden acl_ip_type">{{ acl['name'] }}</div>
+                              <div class="hidden acl_id">{{ acl['name'] }}</div>
+                              <div class="hidden acl_acl">{{ acl['name'] }}</div>
+                              <div class="hidden acl_device">{{ acl['name'] }}</div>
+                              <div class="hidden acl_inteface">{{ acl['name'] }}</div>
+                              <div class="hidden acl_direction">{{ acl['name'] }}</div>
+                            </button>
+                          </td>                        
+                          <td>{{ acl['name'] }}</td>
+                          <td>{{ acl['ip-type'] }}</td>
+                          <td>{{ acl['id'] }} </td>
+                          <td>{{ acl['acl'] }} </td>
+                          {% for app in acl['apply'][0:1] %}
+                            <td>{{app['device'] }}</td>
+                            <td>{{ app['interface'] }}</td>
+                            <td>{{ app['direction'] }}</td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                   </table>
+                 </div>
+                 <!-- /.table-responsive -->
+                </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+                </div>
+               <!-- /.box-footer -->
+             </div>
+            </div> <!-- /topology pane -->
+          
+
+           <div class="tab-pane" id="QOS">
+         
+              <!-- TABLE: NSO Packages -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">QoS Service</h3>
+
+                  <div class="box-tools pull-right">
+                     <button type="button" data-target="#qosAddModal" data-toggle="modal" class="create-qos btn btn-default">New QoS</button>
+                  </div>
+               </div>
+
+
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+               </div>
+               <!-- /.box-header -->
+               <div class="box-body">
+                 <div class="table-responsive">
+                   <table class="table no-margin table-condensed">
+                     <thead>
+                        <tr>
+                         <th data-field="state" data-checkbox="true"></th>
+                         <th>Device</th>
+                         <th>Interface</th>
+                         <th>Policy</th>
+                         <th>Direction</th>
+                      </tr>
+                     </thead>
+                     <tbody>
+
+                       {% for qs in qos %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="qosDelete" style="border:0px solid black; background-color: transparent;" class="delete-qos btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                  <div class="hidden qos_del_device">{{ qs['device'] }}</div>
+                                 <div class="hidden qos_del_interface">{{ qs['interface'] }}</div>
+                                 <div class="hidden qos_del_policy">{{ qs['policy'] }}</div>
+                               </button>
+                               <button type="submit" id="qosEdit" style="border:0px solid black; background-color: transparent;" data-target="#qosAddModal" data-toggle="modal" class="modify-qos btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden qos_device">{{ qs['device'] }}</div>
+                                 <div class="hidden qos_interface">{{ qs['interface'] }}</div>
+                                 <div class="hidden qos_policy">{{ qs['policy'] }}</div>
+                                 <div class="hidden qos_direction">{{ qs['direction'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ qs['device'] }}</td>
+                          <td>{{ qs['interface'] }}</td>
+                          <td>{{ qs['policy'] }}</td>
+                          <td>{{ qs['direction'] }}</td>
+                        </tr>
+                       {% endfor %}
+
+
+                     </tbody>
+                   </table>
+                 </div>
+                 <!-- /.table-responsive -->
+                </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+                </div>
+               <!-- /.box-footer -->
+             </div>
+            </div> <!-- /qos pane -->
+
+
+          </div> <!-- Tabs -->
+        </div>
+      </div>
+
+      <div class="qosAddModal">
+        <div class="modal" id="qosAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="qosAddModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add QoS Instance</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>Device</label>
+                  <div class="input-group">
+                    <input type="text" id="qos-device" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>TenGigE Interface</label>
+                  <select class="form-control select2" id="qos-interface" style="width: 100%;">
+                      <option>Choose an interface</option>
+                      <option value="1">0/0/0/1</option>
+                      <option value="2">0/0/0/2</option>
+                      <option value="3">0/0/0/3</option>
+                      <option value="4">0/0/0/4</option>
+                      <option value="5">0/0/0/5</option>
+                      <option value="6">0/0/0/6</option>
+                      <option value="7">0/0/0/7</option>
+                      <option value="8">0/0/0/8</option>
+                      <option value="9">0/0/0/9</option>
+                      <option value="10">0/0/0/10</option>
+                      <option value="11">0/0/0/11</option>
+                      <option value="12">0/0/0/12</option>
+                      <option value="13">0/0/0/13</option>
+                      <option value="14">0/0/0/14</option>
+                      <option value="15">0/0/0/15</option>
+                      <option value="16">0/0/0/16</option>
+                      <option value="17">0/0/0/17</option>
+                      <option value="18">0/0/0/18</option>
+                      <option value="19">0/0/0/19</option>
+                      <option value="20">0/0/0/20</option>
+                      <option value="21">0/0/0/21</option>
+                      <option value="22">0/0/0/22</option>
+                      <option value="23">0/0/0/23</option>
+                      <option value="24">0/0/0/24</option>
+                      <option value="25">0/0/0/25</option>
+                      <option value="26">0/0/0/26</option>
+                      <option value="27">0/0/0/27</option>
+                      <option value="28">0/0/0/28</option>
+                      <option value="29">0/0/0/29</option>
+                      <option value="30">0/0/0/30</option>
+                      <option value="31">0/0/0/31</option>
+                      <option value="32">0/0/0/32</option>
+                      <option value="33">0/0/0/33</option>
+                      <option value="34">0/0/0/34</option>
+                      <option value="35">0/0/0/35</option>
+                      <option value="36">0/0/0/36</option>
+                      <option value="37">0/0/0/37</option>
+                      <option value="38">0/0/0/38</option>
+                      <option value="39">0/0/0/39</option>
+                   </select>
+                </div>
+                <div class="form-group">
+                  <label>QoS Policy</label>
+                  <div class="input-group">
+                    <input type="text" id="qos-policy" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                     <label>Direction</label>
+                   <select class="form-control select2" id="qos-direction" style="width: 100%;">
+                       <option selected="selected">ingress</option>
+                      <option>ingress</option>
+                      <option>egress</option>
+                   </select>
+                </div>  
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="qosAddModalClose" data-dismiss="modal" id="qosAddModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpdAddModal">
+        <div class="modal" id="rpdAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="rpdAddModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add RPD Instance</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>RPD MAC Address</label>
+                  <div class="input-group">
+                    <input type="text" id="rpd-mac-address" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                 <div class="form-group">
+                     <label>State</label>
+                   <select class="form-control select2" id="state" style="width: 100%;">
+                       <option selected="selected">Active</option>
+                      <option value="Active" >Active</option>
+                      <option value="Reserved">Reserved</option>
+                   </select>
+                </div>             
+                <div class="form-group">
+                  <label>Site:</label>
+                  <div class="input-group">
+                    <input type="text" id="site" class="form-control" style="width: 100%;">
+                  </div>
+                </div>              
+                <div class="form-group">
+                  <label>CCAP</label>
+                  <div class="input-group">
+                    <input type="text" id="ccap" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Leaf Switch</label>
+                  <div class="input-group">
+                    <input type="text" id="cin-leaf-switch" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>TenGigE Leaf Interface</label>
+                  <select class="form-control select2" data-placeholder="Choose interface"id="cin-leaf-interface" style="width: 100%;">
+                      <option></option>
+                      <option value="1">0/0/0/1</option>
+                      <option value="2">0/0/0/2</option>
+                      <option value="3">0/0/0/3</option>
+                      <option value="4">0/0/0/4</option>
+                      <option value="5">0/0/0/5</option>
+                      <option value="6">0/0/0/6</option>
+                      <option value="7">0/0/0/7</option>
+                      <option value="8">0/0/0/8</option>
+                      <option value="9">0/0/0/9</option>
+                      <option value="10">0/0/0/10</option>
+                      <option value="11">0/0/0/11</option>
+                      <option value="12">0/0/0/12</option>
+                      <option value="13">0/0/0/13</option>
+                      <option value="14">0/0/0/14</option>
+                      <option value="15">0/0/0/15</option>
+                      <option value="16">0/0/0/16</option>
+                      <option value="17">0/0/0/17</option>
+                      <option value="18">0/0/0/18</option>
+                      <option value="19">0/0/0/19</option>
+                      <option value="20">0/0/0/20</option>
+                      <option value="21">0/0/0/21</option>
+                      <option value="22">0/0/0/22</option>
+                      <option value="23">0/0/0/23</option>
+                      <option value="24">0/0/0/24</option>
+                      <option value="25">0/0/0/25</option>
+                      <option value="26">0/0/0/26</option>
+                      <option value="27">0/0/0/27</option>
+                      <option value="28">0/0/0/28</option>
+                      <option value="29">0/0/0/29</option>
+                      <option value="30">0/0/0/30</option>
+                      <option value="31">0/0/0/31</option>
+                      <option value="32">0/0/0/32</option>
+                      <option value="33">0/0/0/33</option>
+                      <option value="34">0/0/0/34</option>
+                      <option value="35">0/0/0/35</option>
+                      <option value="36">0/0/0/36</option>
+                      <option value="37">0/0/0/37</option>
+                      <option value="38">0/0/0/38</option>
+                      <option value="39">0/0/0/39</option>
+                   </select>
+                </div>
+                <div class="form-group">
+                  <label>IPv4 Address</label>
+                  <div class="input-group">
+                    <input type="text" id="cin-ipv4-address" class="form-control" style="width: 100%;">
+                  </div>
+                </div>  
+                <div class="form-group">
+                  <label>IPv4 Mask</label>
+                  <div class="input-group">
+                    <input type="text" id="cin-ipv4-mask" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>IPv6 Prefix</label>
+                  <div class="input-group">
+                    <input type="text" id="cin-ipv6-prefix" class="form-control" style="width: 100%;">
+                  </div>
+                </div> 
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="rpdAddModalClose" data-dismiss="modal" id="rpdAddModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aclAddModal">
+        <div class="modal" id="aclAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="aclAddModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add ACL</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>ACL Name</label>
+                  <div class="input-group">
+                    <input type="text" id="acl-name" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                 <div class="form-group">
+                     <label>IP Type</label>
+                   <select class="form-control select2" id="acl-ip-type" style="width: 100%;">
+                       <option selected="selected">IPv4</option>
+                      <option value="IPv4">IPv4</option>
+                      <option value="IPv6">IPv6</option>
+                   </select>
+                </div>             
+                <div class="form-group">
+                  <label>ACL ID</label>
+                  <div class="input-group">
+                    <input type="text" id="acl-id" class="form-control" style="width: 100%;">
+                  </div>
+                </div>              
+                <div class="form-group">
+                  <label>ACL</label>
+                  <div class="input-group">
+                    <input type="text" id="acl-line" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Device</label>
+                  <div class="input-group">
+                    <input type="text" id="acl-device" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>TenGigE Leaf Interface</label>
+                  <select class="form-control select2" data-placeholder="Choose interface" id="acl-interface" style="width: 100%;">
+                      <option></option>
+                      <option value="1">0/0/0/1</option>
+                      <option value="2">0/0/0/2</option>
+                      <option value="3">0/0/0/3</option>
+                      <option value="4">0/0/0/4</option>
+                      <option value="5">0/0/0/5</option>
+                      <option value="6">0/0/0/6</option>
+                      <option value="7">0/0/0/7</option>
+                      <option value="8">0/0/0/8</option>
+                      <option value="9">0/0/0/9</option>
+                      <option value="10">0/0/0/10</option>
+                      <option value="11">0/0/0/11</option>
+                      <option value="12">0/0/0/12</option>
+                      <option value="13">0/0/0/13</option>
+                      <option value="14">0/0/0/14</option>
+                      <option value="15">0/0/0/15</option>
+                      <option value="16">0/0/0/16</option>
+                      <option value="17">0/0/0/17</option>
+                      <option value="18">0/0/0/18</option>
+                      <option value="19">0/0/0/19</option>
+                      <option value="20">0/0/0/20</option>
+                      <option value="21">0/0/0/21</option>
+                      <option value="22">0/0/0/22</option>
+                      <option value="23">0/0/0/23</option>
+                      <option value="24">0/0/0/24</option>
+                      <option value="25">0/0/0/25</option>
+                      <option value="26">0/0/0/26</option>
+                      <option value="27">0/0/0/27</option>
+                      <option value="28">0/0/0/28</option>
+                      <option value="29">0/0/0/29</option>
+                      <option value="30">0/0/0/30</option>
+                      <option value="31">0/0/0/31</option>
+                      <option value="32">0/0/0/32</option>
+                      <option value="33">0/0/0/33</option>
+                      <option value="34">0/0/0/34</option>
+                      <option value="35">0/0/0/35</option>
+                      <option value="36">0/0/0/36</option>
+                      <option value="37">0/0/0/37</option>
+                      <option value="38">0/0/0/38</option>
+                      <option value="39">0/0/0/39</option>
+                   </select>
+                </div>
+                <div class="form-group">
+                  <label>Direction</label>
+                  <div class="input-group">
+                   <select class="form-control select2" id="acl-direction" style="width: 100%;">
+                       <option selected="selected">egress</option>
+                      <option value="ingress">ingress</option>
+                      <option value="egress">egress</option>
+                   </select>
+
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="aclAddModalClose" data-dismiss="modal" id="aclAddModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rpdVerifyModal">
+        <div class="modal modal-primary" id="rpdVerifyModal" tabindex=-1>
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">RPD Verify Results</h4>
+              </div>
+              <form  role="form" id="verifyModal">
+              <div class="modal-body ">
+        
+                <pre class="prettyprint pre-scrollable">
+                   <span class="verify-results" style="font-size: 11px">
+   
+                   </span>
+                </pre>
+                <div class="form-group">
+                  <label>RPD MAC Address</label>
+                   <div class="input-group">
+                     <input type="text" id="verify-rpd-mac-address" class="form-control" style="width: 100%;">
+                   </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="submit" id="executeVerify" class="btn btn-default pull-left">Verify RPD</button>
+                  <button type="button" id="rpdVerifyModalClose" data-dismiss="modal" id="aclAddModalClose" class="btn btn-default pull-right">Close</button>
+              
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+  iface2index = { '0/0/0/1' : '1',   '0/0/0/2' : '2', '0/0/0/3' : '3',     '0/0/0/4' : '4',
+            '0/0/0/5' : '5',   '0/0/0/6' : '6', '0/0/0/7' : '7',     '0/0/0/8' : '8',
+            '0/0/0/9' : '9',   '0/0/0/10' : '10', '0/0/0/11' : '11', '0/0/0/12' : '12',
+            '0/0/0/13' : '13', '0/0/0/14' : '14', '0/0/0/15' : '15', '0/0/0/16' : '16',
+            '0/0/0/17' : '17', '0/0/0/18' : '18', '0/0/0/19' : '19', '0/0/0/20' : '20',
+            '0/0/0/21' : '21', '0/0/0/22' : '22', '0/0/0/23' : '23', '0/0/0/24' : '24',
+            '0/0/0/25' : '25', '0/0/0/26' : '26', '0/0/0/27' : '27', '0/0/0/28' : '28',
+            '0/0/0/29' : '29', '0/0/0/30' : '30', '0/0/0/31' : '31', '0/0/0/32' : '32',
+            '0/0/0/33' : '33', '0/0/0/34' : '34', '0/0/0/35' : '35', '0/0/0/36' : '36',
+            '0/0/0/37' : '37', '0/0/0/38' : '38', '0/0/0/39' : '39'};
+
+  index2iface = {'1': '0/0/0/1', '2' : '0/0/0/2', '3' : '0/0/0/3', '4' : '0/0/0/4',
+            '5'  : '0/0/0/5', '6' :  '0/0/0/6', '7' : '0/0/0/7',  '8' : '0/0/0/8',
+            '9'  : '0/0/0/9',  '10': '0/0/0/10', '11': '0/0/0/11', '9' : '0/0/0/12',
+            '13' : '0/0/0/13', '14': '0/0/0/14', '15': '0/0/0/15', '16' : '0/0/0/16',
+            '17' : '0/0/0/17', '18': '0/0/0/18', '19': '0/0/0/19', '20' : '0/0/0/20',
+            '21' : '0/0/0/21', '22': '0/0/0/22', '23': '0/0/0/23', '24' : '0/0/0/24',
+            '25' : '0/0/0/25', '26': '0/0/0/26', '27': '0/0/0/27', '28' : '0/0/0/28',
+            '29' : '0/0/0/29', '30': '0/0/0/30', '31': '0/0/0/31', '29' : '0/0/0/32',
+            '33' : '0/0/0/33', '34': '0/0/0/34', '35': '0/0/0/35', '36' : '0/0/0/36',
+            '37' : '0/0/0/37', '38': '0/0/0/38', '39': '0/0/0/39'};
+
+  $('.delete-rpd').click(function(event) {
+      rpd = $(this).find(".rpd_del_name").html();
+      $.ajax({
+         data : {
+           'rpd' : rpd
+      },
+      type : 'POST',
+      url : '/shaw/rpd/del'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        
+      }
+      else {
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+  });
+
+  $('.modify-acl').click(function(event) {
+    acl = $(this).find(".rpd_mac").html();
+    $('#aclAddModal .modal-title').html("Modify Existing ACL");
+
+  });
+
+  $('.modify-rpd').click(function(event) {
+     rpd = $(this).find(".rpd_mac").html();
+     $('#rpdAddModal .modal-title').html("Modify Existing RPD");
+     site = $(this).find(".rpd_site").html();
+     state = $(this).find(".rpd_state").html();
+     ccap = $(this).find(".rpd_ccap").html();
+     cin = $(this).find(".rpd_cin_leaf").html();
+     cin_int = $(this).find(".rpd_cin_leaf_interface").html();
+     ipa = $(this).find(".rpd_cin_leaf_ipv4_addr").html();
+     ipm = $(this).find(".rpd_cin_leaf_ipv4_mask").html();
+     ip6p = $(this).find(".rpd_cin_leaf_ipv6_prefix").html();
+     $('#rpdAddModal  input[id=rpd-mac-address]').val(rpd);
+     $('#rpdAddModal  input[id=rpd-mac-address]').prop('disabled', true);
+     $('#rpdAddModal  input[id=site]').val(site);
+     $('#rpdAddModal  input[id=state]').val(state);
+     $('#rpdAddModal  input[id=ccap]').val(ccap);
+     $('#rpdAddModal  input[id=cin-leaf-switch]').val(cin);
+     $('#rpdAddModal  input[id=cin-leaf-interface]').val(cin_int);
+     
+
+     $('#rpdAddModal  input[id=cin-ipv4-address]').val(ipa);
+     $('#rpdAddModal  input[id=cin-ipv4-mask]').val(ipm);
+     $('#rpdAddModal  input[id=cin-ipv6-prefix]').val(ip6p);
+     console.log(cin_int);
+     $('#cin-leaf-interface').select2().val(iface2index[cin_int]).trigger('change');
+     $('#state').select2().val(state).trigger('change');
+  });
+
+  $('.create-rpd').click(function(event) {
+     $('#rpdAddModal .modal-title').html("Create New RPD");     
+     $('#rpdAddModal  input[id=rpd-mac-address]').val('');
+     $('#rpdAddModal  input[id=rpd-mac-address]').prop('disabled', false);
+     $('#rpdAddModal  input[id=site]').val('');
+     $('#rpdAddModal  input[id=state]').val('');
+     $('#rpdAddModal  input[id=ccap]').val('');
+     $('#rpdAddModal  input[id=cin-leaf-switch]').val('');
+     $('#rpdAddModal  input[id=cin-leaf-interface]').val('');
+     $('#rpdAddModal  input[id=cin-ipv4-address]').val('');
+     $('#rpdAddModal  input[id=cin-ipv4-mask]').val('');
+     $('#rpdAddModal  input[id=cin-ipv6-prefix]').val('');
+
+  });
+  
+  $('.verify-rpd').click(function(event) {
+     rpd = $(this).find(".rpd_verify_mac").html();
+     $('#rpdVerifyModal  input[id=verify-rpd-mac-address]').val(rpd);
+     $('#rpdVerifyModal  input[id=verify-rpd-mac-address]').prop('disabled', true);
+     $(".verify-results").text("");
+  });
+
+  var verify = function(rpd) {
+      $(".dry-run-results").html("");
+      $.ajax({
+         data : {
+          'rpd' : rpd
+         },
+         type : 'POST',
+         url : '/shaw/rpd/verify'
+      })
+      .done(function(data) {
+        dataDisplay =  '\n' + data.status + '\n' + data.message
+        $(".verify-results").html(dataDisplay);
+      });
+  };
+
+  $('#executeVerify').on('click', function(event) {
+      rpd =  $('#verify-rpd-mac-address').val();
+      verify(rpd);
+      event.preventDefault();
+  });
+
+
+  $('#rpdAddModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'rpd' : $('#rpd-mac-address').val(),
+           'state' : $('#state').val(),
+           'site' : $('#site').val(),
+           'ccap' : $('#ccap').val(),
+           'leaf' : $('#cin-leaf-switch').val(),
+           'leaf-intf' : index2iface[$('#cin-leaf-interface').val()],
+           'ipv4a' : $('#cin-ipv4-address').val(),
+           'ipv4m' : $('#cin-ipv4-mask').val(),
+           'ipv6p' : $('#cin-ipv6-prefix').val()
+      },
+      type : 'POST',
+      url : '/shaw/rpd/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#rpdAddModal').modal('hide')
+      }
+      else {
+        $('#rpdAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload(); 
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('#aclAddModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'name'   : $('#acl-name').val(),
+           'ip-type': $('#acl-ip-type').val(),
+           'id'     : $('#acl-id').val(),
+           'acl'    : $('#acl-line').val(),
+           'device' : $('#acl-device').val(),
+           'interface': index2iface[$('#acl-interface').val()],
+           'direction' : $('#acl-direction').val()
+      },
+      type : 'POST',
+      url : '/shaw/acl/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#rpdAddModal').modal('hide')
+      }
+      else {
+        $('#rpdAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload(); 
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('.delete-acl').click(function(event) {
+      name = $(this).find(".acl_del_name").html();
+      $.ajax({
+         data : {
+           'name' : name
+      },
+      type : 'POST',
+      url : '/shaw/acl/del'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        
+      }
+      else {
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+  });
+
+  $('#qosAddModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'device' : $('#qos-device').val(),
+           'interface' : index2iface[$('#qos-interface').val()],
+           'policy' : $('#qos-policy').val(),
+           'direction' : index2iface[$('#qos-direction').val()],
+      },
+      type : 'POST',
+      url : '/shaw/qos/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#rpdAddModal').modal('hide')
+      }
+      else {
+        $('#rpdAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload(); 
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('.delete-qos').click(function(event) {
+      qsd = $(this).find(".qos_del_device").html();
+      qsi = $(this).find(".qos_del_interface").html();
+      qsp = $(this).find(".qos_del_policy").html();
+      $.ajax({
+         data : {
+           'device' : qsd,
+           'interface' : qsi,
+           'policy' : qsp,
+      },
+      type : 'POST',
+      url : '/shaw/qos/del'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        
+      }
+      else {
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+  });
+
+{% endblock %}
+
+

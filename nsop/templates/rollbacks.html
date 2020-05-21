@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | Rollbacks</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        Rollback File(s)
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">rollbacks</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+             <!-- TABLE: VPNs -->
+             <div class="box">
+                <div class="box-header with-border">
+                   <h3 class="box-title">Rollback File Details</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                   <div class="table-responsive">
+                    <table id="rollbackTable" class="table table-bordered table-hover table-striped">
+                      <thead>
+                        <tr>
+                           <th data-field="state" data-checkbox="true">Load</th>
+                           <th>Number</th>
+                           <th>File</th>
+                           <th>Source</th>
+                           <th>User</th>
+                           <th>Date</th>
+                           <th>Comment</th>
+                           <th>Label</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                       {% for rb in rollbacks %}
+                         
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="loadRollback" style="border:0px solid black; background-color: transparent;" class="load-rollback btn btn-default btn-transparent btn-xs"><i class="fa fa-arrow-circle-up"></i>
+                                 <div class="hidden rb_nr">{{ rb['nr'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ rb['nr']  }}</td>
+                          <td>{{ rb['filename'] }}</td>
+                          <td>{{ rb['via'] }}</td>
+                          <td>{{ rb['creator'] }}</td>
+                          <td>{{ rb['date']}}</td>
+                          <td>{{ rb['comment'] }}</td>
+                          <td>{{ rb['label'] }} </td>
+                        </tr>
+                       {% endfor %}
+                     </tbody>
+                    </table>
+                  </div>
+                  <!-- /.table-responsive -->
+                 </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+             
+                </div>
+                <!-- /.box-footer -->
+              </div>
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+
+  $("#rollbackTable").DataTable({
+      lengthMenu:[[50, 100, 150, -1], [50, 100, 150, "All"]],
+  });
+  
+  $('.load-rollback').on('click', function(event) {
+       rollback_number =  $(this).find(".rb_nr").html();
+       $.ajax({
+         data : {
+           'nr' : rollback_number
+      },
+      type : 'POST',
+      url : '/rollbacks/load'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        location.reload();
+      }
+      else {
+        
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+ 
+      }
+    });
+    event.preventDefault();
+  });
+
+{% endblock %}
+
+

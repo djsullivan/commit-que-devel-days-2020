@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | NSO Dashboard</title>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small>NSO Version {{system['version']}}</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Info boxes -->
+      <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-aqua"><i class="ion ion-ios-speedometer"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Python VM Status</span>
+              <span class="info-box-number">
+                 <small>{{pvmi['status']}}</small>
+              </span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            {% if system['alarms-summary']['total'] == 0 %}
+              <span class="info-box-icon bg-green"><i class="ion ion-ios-alarm"></i></span>
+            {% elif system['alarms-summary']['criticals'] > 0 %}
+              <span class="info-box-icon bg-red"><i class="ion ion-ios-alarm"></i></span>
+            {% elif system['alarms-summary']['warnings'] > 0 %}
+              <span class="info-box-icon bg-orange"><i class="ion ion-ios-alarm"></i></span>
+            {% else %}
+              <span class="info-box-icon bg-yellow"><i class="ion ion-ios-alarm"></i></span>
+            {% endif %}
+            <div class="info-box-content">
+              <span class="info-box-text">Active Alarms</span>
+              <span class="info-box-number">{{system['alarms-summary']['total'] }}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            {% if 'running' in system['jvm-status'] %}
+            <span class="info-box-icon bg-green"><i class="fa  fa-coffee"></i></span>
+            {% else %}
+            <span class="info-box-icon bg-red"><i class="fa  fa-coffee"></i></span>
+            {% endif %}
+            <div class="info-box-content">
+              <span class="info-box-text">Java VM Status</span>
+              <span class="info-box-number"><small>{{system['jvm-status']}}</small></span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Active Sessions</span>
+              <span class="info-box-number">{{system['users']}}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+        
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <div class="col-md-6">
+          <!-- TABLE: NSO Packages -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">NSO Services Information</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Service Point</th>
+                    <th>Service Count</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for srv in srvinfo %}
+                    <tr>
+                      <td>{{ srv['path'] }}</td>
+                      <td>{{ srv['count'] }}</td>
+                    </tr>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+          <!-- TABLE: NSO Packages -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">Package Inventory Status</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Package Name</th>
+                    <th>Status</th>
+                    <th>Version</th>
+                    <th>Description</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for package in packages %}
+                    <tr>
+                      <td>{{ package['name'] }}</td>
+                      {% if "Up" in package['oper-status'] %}
+                          <td><span class="label label-success">{{ package['oper-status'] }}</span></td>
+                      {% else %}
+                         <td><span class="label label-danger">{{ package['oper-status'] }}</span></td>
+                      {% endif %}
+                      <td>{{ package['package-version'] }}</td>
+                      <td>{{ package['description'] }}</td>
+                    </tr>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+          <!-- TABLE: NSO Alarms -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">Alarms</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Device</th>
+                    <th>Cleared</th>
+                    <th>Last Update</th>
+                    <th>Description</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for alarm in alarms %}
+                    <tr>
+                      <td>{{ alarm['type'] }}</td>
+                      <td>{{ alarm['device'] }}</td>
+                       {% if "Cleared" in alarm['is-cleared'] %}
+                          <td><span class="label label-success">{{ alarm['is-cleared'] }}</span></td>
+                      {% else %}
+                          <td><span class="label label-danger">{{ alarm['is-cleared'] }}</span></td>
+                      {% endif %}
+                      <td>{{ alarm['last-status-change']}} </td>
+                      <td>{{ alarm['last-alarm-text']}} </td>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+
+        </div>
+          <!-- Left col -->
+         <!-- Right col -->
+        <div class="col-md-6">
+
+          <!-- TABLE: NSO Sessions -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">NSO Managed Devices</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Device Type</th>
+                    <th>Count</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for dev in devinfo %}
+                    <tr>
+                      <td>{{ dev['name'] }}</td>
+                      <td>{{ dev['count'] }}</td> 
+                    </tr>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+
+          <!-- TABLE: NSO Sessions -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">NSO Python VM</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Application</th>
+                    <th>Status</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for pvm in pvmi['pvm'] %}
+                    <tr>
+                      <td>{{ pvm['class-name'] }}</td>
+                       {% if "running" in pvm['status'] %}
+                          <td><span class="label label-success">{{ pvm['status'] }}</span></td>
+                      {% else %}
+                          <td><span class="label label-danger">{{ pvm['status'] }}</span></td>
+                      {% endif %} 
+                    </tr>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+
+          <!-- TABLE: NSO Sessions -->
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">Active User Sessions</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>Session Id</th>
+                    <th>User</th>
+                    <th>Transport</th>
+                    <th>Login Time</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                   {% for user in users %}
+                    <tr>
+                      <td>{{ user['session-id'] }}</td>
+                      <td>{{ user['username'] }}</td>
+                      <td>{{ user['transport'] }} </td>
+                      <td>{{ user['login-time'] }} </td>  
+                    </tr>
+                   {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- Left col -->
+      </div>
+      <!-- Main row -->
+    </section>
+    <!-- /.content -->
+
+    {% endblock %}

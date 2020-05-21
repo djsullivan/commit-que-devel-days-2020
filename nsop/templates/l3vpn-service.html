@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | L3VPN</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        L3VPN Service
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">l3vpn-service</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+
+      <div class="col-md-12">
+        <div class="nav-tabs-custom">
+          <ul class="nav nav-tabs">
+              <li class="active"><a href="#L3VPN" data-toggle="tab">VPN</a></li>
+              <li><a href="#qos" data-toggle="tab">QoS</a></li>
+             <li><a href="#topology" data-toggle="tab">Topology</a></li>
+          </ul>
+ 
+        <div class="tab-content">
+          <div class="active tab-pane" id="L3VPN">
+
+             <!-- TABLE: VPNs -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                   <h3 class="box-title">Layer3 VPN Details</h3>
+                  <div class="box-tools pull-right">
+                     <button type="button" data-target="#vpnAddModal" data-toggle="modal" class="btn btn-default">add VPN</button>
+                     <button type="button" data-target="#vpnAddModal" data-toggle="modal" class="btn btn-warning">re-deploy VPN</button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                   <div class="table-responsive">
+                    <table id="vpnTable" class="table table-bordered">
+                      <thead>
+                        <tr>
+                           <th data-field="state" data-checkbox="true"></th>
+                           <th>VPN Name</th>
+                           <th>Route Distinguisher</th>
+                           <th>QoS</th>
+                           <th>Endpoints</th>
+                           <th>Name</th>
+                           <th>CE Device</th>
+                           <th>CE interface</th>
+                           <th>IP Network</th>
+                           <th>Bandwidth</th>
+                           <th>AS Number</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                       {% for vpn in vpns %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="vpnDelete" style="border:0px solid black; background-color: transparent;" class="delete-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                 <div class="hidden vpn_del_name">{{ vpn['name'] }}</div>
+                                 <div class="hidden vpn_del_leg">None</div>
+                                 <div class="hidden vpn_op">vpn</div>
+                               </button>
+                               <button type="submit" id="vpnEdit" style="border:0px solid black; background-color: transparent;" data-target="#vpnAddModal" data-toggle="modal" class="modify-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden vpn_name">{{ vpn['name'] }}</div>
+                               </button>
+                               <button type="button" id="vpnEdit" data-target="#vpnAddLegModal" data-toggle="modal"style="border:0px solid black; background-color: transparent;" class="add-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-plus"></i>
+                                 <div class="hidden vpn_name">{{ vpn['name'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ vpn['name'] }}</td>
+                          <td>{{ vpn['route-distinguisher'] }}</td>
+                          <td>{{ vpn['qos'] }}</td>
+                          
+                          {% for ep in vpn['endpoints'][0:1]  %}
+                          <td>
+                            <button type="submit" id="vpnDelete" style="border:0px solid black; background-color: transparent;" class="delete-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                              <div class="hidden vpn_del_leg">{{ ep['id'] }}</div>
+                              <div class="hidden vpn_del_name">{{ vpn['name'] }}</div>
+                              <div class="hidden vpn_op">endpoint</div>
+                            </button>
+                            <button type="submit" id="vpnEdit" style="border:0px solid black; background-color: transparent;" data-target="#vpnAddLegModal" data-toggle="modal" class="modify-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                              <div class="hidden vpn_name">{{ vpn['name'] }}</div>
+                              <div class="hidden id">{{ ep['id'] }}</div>
+                              <div class="hidden ce_device">{{ ep['ce-device'] }}</div>
+                              <div class="hidden ce_interface">{{ ep['ce-interface'] }}</div>
+                              <div class="hidden ip_network">{{ ep['ip-network'] }}</div>
+                              <div class="hidden bandwidth">{{ ep['bandwidth'] }}</div>
+                              <div class="hidden as_number">{{ ep['as-number'] }}</div>
+                            </button>
+                          </td>
+                          <td>{{ ep['id'] }}</td>
+                          <td>{{ ep['ce-device'] }}</td>
+                          <td>{{ ep['ce-interface'] }}</td>
+                          <td>{{ ep['ip-network'] }}</td>
+                          <td>{{ ep['bandwidth'] }}</td>
+                          <td>{{ ep['as-number'] }}</td>
+                          {% endfor %}
+                        </tr>
+                        {% for ep in vpn['endpoints'][1:] %}
+                        <tr class="clickable-row">
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td>
+                            <button type="submit" id="vpnDelete" style="border:0px solid black; background-color: transparent;" class="delete-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                              <div class="hidden vpn_del_leg">{{ ep['id'] }}</div>
+                              <div class="hidden vpn_del_name">{{ vpn['name'] }}</div>
+                              <div class="hidden vpn_op">endpoint</div>
+                            </button>
+                            <button type="submit" id="vpnEdit" style="border:0px solid black; background-color: transparent;" data-target="#vpnAddLegModal" data-toggle="modal" class="modify-leg btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                              <div class="hidden vpn_name">{{ vpn['name'] }}</div>
+                              <div class="hidden id">{{ ep['id'] }}</div>
+                              <div class="hidden ce_device">{{ ep['ce-device'] }}</div>
+                              <div class="hidden ce_interface">{{ ep['ce-interface'] }}</div>
+                              <div class="hidden ip_network">{{ ep['ip-network'] }}</div>
+                              <div class="hidden bandwidth">{{ ep['bandwidth'] }}</div>
+                              <div class="hidden as_number">{{ ep['as-number'] }}</div>
+                            </button>
+                          </td>
+                          <td>{{ ep['id'] }}</td>
+                          <td>{{ ep['ce-device'] }}</td>
+                          <td>{{ ep['ce-interface'] }}</td>
+                          <td>{{ ep['ip-network'] }}</td>
+                          <td>{{ ep['bandwidth'] }}</td>
+                          <td>{{ ep['as-number'] }}</td>
+                        </tr>
+                        {% endfor %}
+                       {% endfor %}
+                     </tbody>
+                    </table>
+                  </div>
+                  <!-- /.table-responsive -->
+                 </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+             
+                </div>
+                <!-- /.box-footer -->
+              </div>
+           </div>
+           <div class="tab-pane" id="topology">
+         
+              <!-- TABLE: NSO Packages -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Network Topology</h3>
+
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+               </div>
+               <!-- /.box-header -->
+               <div class="box-body">
+                 <div class="table-responsive">
+                   <table class="table no-margin">
+                     <thead>
+                        <tr>
+                          <th>Edit</th>
+                          <th>Connection</th>
+                          <th>Link VLAN</th>
+                          <th>EP1 Device</th>
+                          <th>EP1 Interface</th>
+                          <th>EP1 Address </th>
+                          <th>EP2 Device</th>
+                          <th>EP2 Interface</th>
+                          <th>EP2 Address</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for top in topo %}
+                        <tr>
+                          <td>
+                            <button type="submit" id="topEdit" style="border:0px solid black; background-color: transparent;" data-target="#topModal" data-toggle="modal" class="modify-top btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                              <div class="hidden top_name">{{ top['name'] }}</div>
+                              <div class="hidden link_vlan">{{ top['link-vlan'] }}</div>
+                              <div class="hidden ep1_device">{{ top['endpoint-1/device'] }}</div>
+                              <div class="hidden ep1_interface">{{ top['endpoint-1/interface'] }}</div>
+                              <div class="hidden ep1_ip_address">{{ top['endpoint-1/ip-address'] }}</div>
+                              <div class="hidden ep2_device">{{ top['endpoint-2/device'] }}</div>
+                              <div class="hidden ep2_interface">{{ top['endpoint-2/interface'] }}</div>
+                              <div class="hidden ep2_ip_address">{{ top['endpoint-2/ip-address'] }}</div>
+                          </button>
+                          </td>
+                          <td>{{ top['name'] }}</td>
+                          <td>{{ top['link-vlan'] }}</td>
+                          <td>{{ top['endpoint-1/device'] }}</td>
+                          <td>{{ top['endpoint-1/interface'] }}</td>
+                          <td>{{ top['endpoint-1/ip-address'] }}</td>
+                          <td>{{ top['endpoint-2/device'] }}</td>
+                          <td>{{ top['endpoint-2/interface'] }}</td>
+                          <td>{{ top['endpoint-2/ip-address'] }}</td>
+                        </tr>
+                       {% endfor %}
+                     </tbody>
+                   </table>
+                 </div>
+                 <!-- /.table-responsive -->
+                </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+                </div>
+               <!-- /.box-footer -->
+             </div>
+            </div> <!-- /topology pane -->
+          
+
+           <div class="tab-pane" id="qos">
+         
+              <!-- TABLE: NSO Packages -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Network Topology</h3>
+
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+               </div>
+               <!-- /.box-header -->
+               <div class="box-body">
+                 <div class="table-responsive">
+                   <table class="table no-margin table-condensed">
+                     <thead>
+                     </thead>
+                     <tbody>
+                     </tbody>
+                   </table>
+                 </div>
+                 <!-- /.table-responsive -->
+                </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+                </div>
+               <!-- /.box-footer -->
+             </div>
+            </div> <!-- /qos pane -->
+
+
+          </div> <!-- Tabs -->
+        </div>
+      </div>
+      <div class="topModal">
+        <div class="modal modal-primary" id="topModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="topModModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Modify Topology</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>Connection:</label>
+                  <div class="input-group">
+                    <input type="text" id="name" class="form-control">
+                  </div>
+                </div>
+                 <div class="form-group">
+                  <label>Link VLAN:</label>
+                  <div class="input-group">
+                    <input type="text" id="link_vlan" class="form-control">
+                  </div>
+                </div>              
+                 <div class="form-group">
+                  <label>Endpoint (1) device</label>
+                  <div class="input-group">
+                    <input type="text" id="ep1_device" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Endpoint (1) interface</label>
+                  <div class="input-group">
+                    <input type="text" id="ep1_interface" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Endpoint (1) ip address</label>
+                  <div class="input-group">
+                    <input type="text" id="ep1_ip_address" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Endpoint (2) device</label>
+                  <div class="input-group">
+                    <input type="text" id="ep2_device" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Endpoint (2) interface</label>
+                  <div class="input-group">
+                    <input type="text" id="ep2_interface" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Endpoint (2) ip address</label>
+                  <div class="input-group">
+                    <input type="text" id="ep2_ip_address" class="form-control">
+                  </div>
+                </div>                    
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button>
+                  <button type="button" id="topModalClose" data-dismiss="modal" id="topModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="vpnAddModal">
+        <div class="modal modal-primary" id="vpnAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="addVpnModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add L3VPN Instance</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>VPN Name:</label>
+                  <div class="input-group">
+                    <input type="text" id="name" class="form-control">
+                  </div>
+                </div>
+               
+                <div class="form-group">
+                  <label>Route Descriptor:</label>
+                  <div class="input-group">
+                    <input type="text" id="rd" class="form-control">
+                  </div>
+                </div>              
+                <div class="form-group">
+                     <label>QoS:</label>
+                   <select class="form-control select2" id="qos">
+                      <option>BRONZE</option>
+                      <option>SILVER</option>
+                      <option>GOLD</option>
+                   </select>
+                </div
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="vpnAddModalClose" data-dismiss="modal" id="vpnAddModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>  
+
+      <div class="vpnAddLegModalGroup">
+        <div class="modal modal-primary" id="vpnAddLegModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="addVpnLegModal">
+
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add L3VPN Endpoint Instance</h4>
+              </div>
+              <div class="modal-body">
+                              <div class="form-group">
+                <label>VPN Name:</label>
+                  <div class="input-group">
+                    <input type="text" id="vpn_name" class="hiden form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>VPN Endpoint Name:</label>
+                  <div class="input-group">
+                    <input type="text" id="ep-name" class="form-control">
+                  </div>
+                </div>
+               
+                <div class="form-group">
+                  <label>CE</label>
+                  <div class="input-group">
+                    <input type="text" id="ce" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>CE Interface</label>
+                  <div class="input-group">
+                    <input type="text" id="ce-interface" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>IP Network</label>
+                  <div class="input-group">
+                    <input type="text" id="ip-network" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Bandwidth</label>
+                  <div class="input-group">
+                    <input type="text" id="bandwidth" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>AS Number</label>
+                  <div class="input-group">
+                    <input type="text" id="as-number" class="form-control">
+                  </div>
+                </div>
+              </div> 
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="vpnAddLegClose" data-dismiss="modal" id="vpnAddLegClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+
+  $('.delete-leg').click(function(event) {
+      vpn = $(this).find(".vpn_del_name").html();
+      edp = $(this).find(".vpn_del_leg").html();
+      type = $(this).find(".vpn_op").html();
+      $.ajax({
+         data : {
+           'type' : type,
+           'vpn' : vpn,
+           'endpoint' : edp
+      },
+      type : 'POST',
+      url : '/l3vpn-service/del'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        
+      }
+      else {
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+  });
+
+  $('.add-leg').click(function(event) {
+     vpn = $(this).find(".vpn_name").html();
+     $('#vpnAddLegModal .modal-title').html("VPN [" + vpn + "]   Add New Endpoint");
+     $('#vpnAddLegModal  input[id=vpn_name]').val(vpn);
+     $('#vpnAddLegModal  input[id=ep-name]').val("");
+     $('#vpnAddLegModal  input[id=ce]').val("");
+     $('#vpnAddLegModal  input[id=ce-interface]').val("");
+     $('#vpnAddLegModal  input[id=ip-network]').val("");
+     $('#vpnAddLegModal  input[id=bandwidth]').val("");
+     $('#vpnAddLegModal  input[id=as-number]').val("");
+  });
+  $('.modify-leg').click(function(event) {
+     vpn = $(this).find(".vpn_name").html();
+     $('#vpnAddLegModal .modal-title').html("Modify Existing VPN Endpoint");
+     vpn = $(this).find(".vpn_name").html();
+     epid = $(this).find(".id").html();
+     ce_dev = $(this).find(".ce_device").html();
+     ce_int = $(this).find(".ce_interface").html();
+     ipn = $(this).find(".ip_network").html();
+     bw = $(this).find(".bandwidth").html();
+     asn = $(this).find(".as_number").html();
+     
+     $('#vpnAddLegModal  input[id=vpn_name]').val(vpn);
+     $('#vpnAddLegModal  input[id=ep-name]').val(epid);
+     $('#vpnAddLegModal  input[id=ce]').val(ce_dev);
+     $('#vpnAddLegModal  input[id=ce-interface]').val(ce_int);
+     $('#vpnAddLegModal  input[id=ip-network]').val(ipn);
+     $('#vpnAddLegModal  input[id=bandwidth]').val(bw);
+     $('#vpnAddLegModal  input[id=as-number]').val(asn);
+  });
+
+  $('.modify-top').click(function(event) { 
+     conn = $(this).find(".top_name").html();
+     vlan = $(this).find(".link_vlan").html();
+     ep1_dev = $(this).find(".ep1_device").html();
+     ep1_int = $(this).find(".ep1_interface").html();
+     ep1_ip = $(this).find(".ep1_ip_address").html();
+     ep2_dev = $(this).find(".ep2_device").html();
+     ep2_int = $(this).find(".ep2_interface").html();
+     ep2_ip = $(this).find(".ep2_ip_address").html();
+     
+     $('#topModal  input[id=name]').val(conn);
+     $('#topModal  input[id=link_vlan').val(vlan);
+     $('#topModal  input[id=ep1_device]').val(ep1_dev);
+     $('#topModal  input[id=ep1_interface]').val(ep1_int);
+     $('#topModal  input[id=ep1_ip_address]').val(ep1_ip);
+     $('#topModal  input[id=ep2_device]').val(ep2_dev);
+     $('#topModal  input[id=ep2_interface]').val(ep2_int);
+     $('#topModal  input[id=ep2_ip_address]').val(ep2_ip);
+  });
+
+  $('#topModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           type : 'top',
+           name : $('#name').val(),
+           'link_vlan' : $('#link_vlan').val(),
+           'ep1-device' : $('#ep1_dev').val(),
+           'ep1-interface' : $('#ep1_interface').val(),
+           'ep1-ip-address' : $('#ep1_ip_address').val(),
+           'ep2-device' : $('#ep2_dev').val(),
+           'ep2-interface' : $('#ep2_interface').val(),
+           'ep2-ip-address' : $('#ep2_ip_address').val()         
+      },
+      type : 'POST',
+      url : '/l3vpn-service/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#topAddModal').modal('hide')
+      }
+      else {
+        $('#topAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+    event.preventDefault();
+  });
+  
+  $('#vpnAddLegModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'type' : 'endpoint',
+           'vpn' : $('#vpn_name').val(),
+           'name' : $('#ep-name').val(),
+           'ce-device' : $('#ce').val(),
+           'ce-interface': $('#ce-interface').val(),
+           'ip-network': $('#ip-network').val(),
+           'bandwidth' : $('#bandwidth').val(),
+           'as-number' : $('#as-number').val()
+      },
+      type : 'POST',
+      url : '/l3vpn-service/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#vpnAddModal').modal('hide')
+        console.log("Here")
+      }
+      else {
+        $('#vpnAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload(); 
+      }
+    });
+    event.preventDefault();
+  });
+
+  $('#vpnAddLegModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'type' : 'endpoint',
+           'vpn' : $('#vpn_name').val(),
+           'name' : $('#ep-name').val(),
+           'ce-device' : $('#ce').val(),
+           'ce-interface': $('#ce-interface').val(),
+           'ip-network': $('#ip-network').val(),
+           'bandwidth' : $('#bandwidth').val(),
+           'as-number' : $('#as-number').val()
+      },
+      type : 'POST',
+      url : '/l3vpn-service/add'
+    })
+    .done(function(data) {
+      if (data.error) {
+        $('#vpnAddModal').modal('hide')
+        
+      }
+      else {
+        $('#vpnAddLegModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+    event.preventDefault();
+  });
+
+{% endblock %}
+
+

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | Cable Port Status</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        Cable CIN Ports
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Ports</a></li>
+        <li><a href="#">cable-ports</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+             <!-- TABLE: Ports -->
+             <div class="box">
+                <div class="box-header with-border">
+                   <h3 class="box-title">TenGigE Port Status</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                   <div class="table-responsive">
+                    <table id="portTable" class="table table-bordered table-hover table-striped">
+                      <thead>
+                        <tr>
+                           <th data-field="state" data-checkbox="true"></th>
+                           <th>Interface</th>
+                           <th>mtu</th>
+                           <th>Description</th>
+                           <th>Admin State</th>
+                           <th>Line State</th>
+                           <th>IPv4 Address</th>
+                           <th>IPv4 Mask</th>
+                           <th>IPv6 Prefix</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                       {% for port in ports  %}
+                       <tr>
+                          <td>
+                          </td>
+                          <td>{{ port['id'] }}</td>
+                          <td>{{ port['mtu'] }}</td>
+                          <td>{{ port['description'] }}</td>
+                          <td>{{ port['admin-state'] }}</td>
+                          <td>{{ port['line-state']}}</td>
+                          <td>{{ port['ipv4/address/ip']}}</td>
+                          <td>{{ port['ipv4/address/mask']}}</td>
+                          <td>{{ port['ipv6/prefix']}}</td>
+                        </tr>
+                       {% endfor %}
+                     </tbody>
+                    </table>
+                  </div>
+                  <!-- /.table-responsive -->
+                 </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+             
+                </div>
+                <!-- /.box-footer -->
+              </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+
+  $("#portTable").DataTable({
+      lengthMenu:[[20, 40, 50, -1], [20, 40, 50, "All"]],
+  });
+
+{% endblock %}
+
+

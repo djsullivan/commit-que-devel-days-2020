@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}
+  <title>NSO Portal | Cable CIN Network</title>
+{% endblock %}
+
+{% block content_header %}
+      <h1>
+        Cable CIN Network Onboarding
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-gear"></i> Home</a></li>
+        <li><a href="#">cable-onboard</a></li>
+      </ol>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main content -->
+    <section class="content">
+
+
+      <div class="col-md-12">
+        <div class="nav-tabs-custom">
+          <ul class="nav nav-tabs">
+              <li><a href="#Device Onboarding" data-toggle="tab">Onboarding</a></li>
+          </ul>
+ 
+        <div class="tab-content">
+          <div class="active tab-pane" id="ONBOARD">
+
+             <!-- TABLE: VPNs -->
+             <div class="box box-info">
+                <div class="box-header with-border">
+                   <h3 class="box-title">Onboarding Details</h3>
+                  <div class="box-tools pull-right">
+                     <button type="button" data-target="#obdAddModal" data-toggle="modal" class="create-obd btn-default">Onboard New Device</button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                   <div class="table-responsive">
+                    <table id="onboardTable" class="table table-bordered">
+                      <thead>
+                        <tr>
+                           <th data-field="state" data-checkbox="true"></th>
+                           <th>Site</th>
+                           <th>Device Name</th>
+                           <th>Status</th>
+                           <th>Role</th>
+                           <th>IP Address</th>
+                           <th>Port</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                       {% for obd in obds %}
+                         {% for ccap in obd['ccap'] %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="onboardDelete" style="border:0px solid black; background-color: transparent;" class="delete-obd btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                 <div class="hidden obd_del_name">{{ obd['device'] }}</div>
+                               </button>
+                               <button type="submit" id="obdEdit" style="border:0px solid black; background-color: transparent;" data-target="#obdAddModal" data-toggle="modal" class="modify-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden obd_site">{{ obd['site']}}</div>
+                                 <div class="hidden obd_name">{{ ccap['device'] }}</div>
+                                 <div class="hidden obd_role">CCAP</div>
+                                 <div class="hidden obd_ip_address">{{ ccap['ip-address'] }}</div>
+                                 <div class="hidden obd_port">{{ ccap['port'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ obd['site'] }}</td>
+                          <td>{{ ccap['device'] }}</td>
+                          <td>Onboarded</td>
+                          <td>CCAP</td>
+                          <td>{{ ccap['ip-address']}}</td>
+                          <td>{{ ccap['port']}}</td>
+                        </tr>
+                        {% endfor %}
+                       {% for spn in obd['spine'] %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="onboardDelete" style="border:0px solid black; background-color: transparent;" class="delete-obd btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                 <div class="hidden obd_del_name">{{ spn['device'] }}</div>
+                               </button>
+                               <button type="submit" id="obdEdit" style="border:0px solid black; background-color: transparent;" data-target="#obdAddModal" data-toggle="modal" class="modify-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden obd_site">{{ obd['site']}}</div>
+                                 <div class="hidden obd_name">{{ spn['device'] }}</div>
+                                 <div class="hidden obd_role">Spine</div>
+                                 <div class="hidden obd_ip_address">spn['ip-address']</div>
+                                 <div class="hidden obd_port">{{ spn['port'] }}</div>
+                              <button type="submit" id="onboardPorts" style="border:0px solid black; background-color: transparent;" class="display-ports btn btn-default btn-transparent btn-xs"><i class="fa fa-eye"></i>
+                                 <div class="hidden obd_port_device">{{ spn['device'] }}</div>
+                               </button>
+
+                               </button>
+                          </td>
+                          <td>{{ obd['site'] }}</td>
+                          <td>{{ spn['device'] }}</td>
+                          <td>Onboarded</td>
+                          <td>Spine</td>
+                          <td>{{ spn['ip-address']}}</td>
+                          <td>{{ spn['port']}}</td>
+                        </tr>
+                        {% endfor %}
+                       {% for lf in obd['leaves'] %}
+                       <tr class="clickable-row">
+                          <td>
+                              <button type="submit" id="onboardDelete" style="border:0px solid black; background-color: transparent;" class="delete-obd btn btn-default btn-transparent btn-xs"><i class="fa fa-trash"></i>
+                                 <div class="hidden obd_del_name">{{ lf['device'] }}</div>
+                               </button>
+                               <button type="submit" id="obdEdit" style="border:0px solid black; background-color: transparent;" data-target="#obdAddModal" data-toggle="modal" class="modify-rpd btn btn-default btn-transparent btn-xs"><i class="fa fa-edit"></i>
+                                 <div class="hidden obd_site">{{ obd['site']}}</div>
+                                 <div class="hidden obd_name">{{ lf['device'] }}</div>
+                                 <div class="hidden obd_role">Leaf</div>
+                                 <div class="hidden obd_ip_address">{{ lf['ip-address'] }}</div>
+                                 <div class="hidden obd_port">{{ lf['port'] }}</div>
+                               </button>
+                               <button type="submit" id="onboardPorts" style="border:0px solid black; background-color: transparent;" class="display-ports btn btn-default btn-transparent btn-xs"><i class="fa fa-eye"></i>
+                                 <div class="hidden obd_port_device">{{ lf['device'] }}</div>
+                               </button>
+                          </td>
+                          <td>{{ obd['site'] }}</td>
+                          <td>{{ lf['device'] }}</td>
+                          <td>{{ lf['status'] }}</td>
+                          <td>Leaf</td>
+                          <td>{{ lf['ip-address']}}</td>
+                          <td>{{ lf['port']}}</td>
+                        </tr>
+                        {% endfor %}
+                       {% endfor %}
+                     </tbody>
+                    </table>
+                  </div>
+                  <!-- /.table-responsive -->
+                 </div>
+                 <!-- /.box-body -->
+                 <div class="box-footer clearfix">
+             
+                </div>
+                <!-- /.box-footer -->
+              </div>
+           </div>
+
+
+      <div class="obdAddModal">
+        <div class="modal" id="obdAddModal" tabindex=-1>
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form  role="form" id="rpdAddModal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Onboard New Device</h4>
+              </div>
+              <div class="modal-body">
+              
+                <div class="form-group">
+                  <label>Site</label>
+                  <div class="input-group">
+                    <input type="text" id="obd-site" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Device Name</label>
+                  <div class="input-group">
+                    <input type="text" id="obd-name" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+                 <div class="form-group">
+                     <label>Role</label>
+                   <select class="form-control select2" id="obd-role" style="width: 100%;">
+                       <option selected="selected">Leaf</option>
+                      <option>CCAP</option>
+                      <option>Leaf</option>
+                      <option>Spine</option>
+                   </select>
+                </div>             
+                <div class="form-group">
+                  <label>Ip Address</label>
+                  <div class="input-group">
+                    <input type="text" id="obd-address" class="form-control" style="width: 100%;">
+                  </div>
+                </div>              
+                <div class="form-group">
+                  <label>Port</label>
+                  <div class="input-group">
+                    <input type="text" id="obd-port" class="form-control" style="width: 100%;">
+                  </div>
+                </div>
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-default pull-left">Save changes</button> 
+                  <button type="button" id="obdAddModalClose" data-dismiss="modal" id="obdAddModalClose" class="btn btn-default pull-right">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block scripts %}
+
+  $('.display-ports').on('click', function(event) {
+       name = $(this).find(".obd_port_device").html();
+       window.location.href = '/ports/' + name; 
+  });
+
+
+  $('.delete-obd').click(function(event) {
+      name = $(this).find(".obd_del_name").html();
+      $.ajax({
+         data : {
+           'name' : name
+      },
+      type : 'POST',
+      url : '/shaw/obd/del'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        
+      }
+      else {
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload();
+      }
+    });
+  });
+
+  $('.modify-obd').click(function(event) {
+     rpd = $(this).find(".rpd_mac").html();
+     $('#rpdAddModal .modal-title').html("Modify Existing Device");
+     site = $(this).find(".rpd_site").html();
+     state = $(this).find(".rpd_state").html();
+     ccap = $(this).find(".rpd_ccap").html();
+     cin = $(this).find(".rpd_cin_leaf").html();
+     cin_int = $(this).find(".rpd_cin_leaf_interface").html();
+     ipa = $(this).find(".rpd_cin_leaf_ipv4_addr").html();
+     ipm = $(this).find(".rpd_cin_leaf_ipv4_mask").html();
+     ip6p = $(this).find(".rpd_cin_leaf_ipv6_prefix").html();
+     cin_int_num = '20';
+     $('#rpdAddModal  input[id=rpd-mac-address]').val(rpd);
+     $('#rpdAddModal  input[id=rpd-mac-address]').prop('disabled', true);
+     $('#rpdAddModal  input[id=site]').val(site);
+     $('#rpdAddModal  input[id=state]').val(state);
+     $('#rpdAddModal  input[id=ccap]').val(ccap);
+     $('#rpdAddModal  input[id=cin-leaf-switch]').val(cin);
+     $('#rpdAddModal  input[id=cin-leaf-interface]').val(cin_int);
+     
+
+     $('#rpdAddModal  input[id=cin-ipv4-address]').val(ipa);
+     $('#rpdAddModal  input[id=cin-ipv4-mask]').val(ipm);
+     $('#rpdAddModal  input[id=cin-ipv6-prefix]').val(ip6p);
+      $('#cin-leaf-interface').select2("val", "3").trigger('select2:select');
+  });
+
+  $('.create-obd').click(function(event) {
+     $('#obdAddModal .modal-title').html("Onboard New Device");     
+     $('#obdAddModal  input[id=obd-site]').val('');
+     $('#obdAddModal  input[id=obd-name]').prop('disabled', false);
+     $('#obdAddModal  input[id=obd-role]').val('');
+     $('#obdAddModal  input[id=obd-address]').val('');
+     $('#obdAddModal  input[id=obd-port]').val('');
+  });
+  
+  $('#obdAddModal').on('submit', function(event) {
+       $.ajax({
+         data : {
+           'name' : $('#obd-name').val(),
+           'site' : $('#obd-site').val(),
+           'role' : $('#obd-role').val(),
+           'ip-address' : $('#obd-address').val(),
+           'port' : $('#obd-port').val()
+
+      },
+      type : 'POST',
+      url : '/shaw/onboard/add'
+    })
+    .done(function(data) {
+
+      if (data.error) {
+        $('#obdAddModal').modal('hide')
+      }
+      else {
+        $('#obdAddModal').modal('hide')
+        $("#commit").removeClass("btn-default").addClass("btn-success");
+        $("#dry-run").removeClass("btn-default").addClass("btn-success");
+        location.reload(); 
+      }
+    });
+    event.preventDefault();
+  });
+
+
+{% endblock %}
+
+

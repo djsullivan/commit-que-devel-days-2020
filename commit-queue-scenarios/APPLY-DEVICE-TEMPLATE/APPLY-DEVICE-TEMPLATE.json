@@ -1,0 +1,98 @@
+{
+    "name"   : "NSO Commit Queue Rollback",
+    "steps" : [
+       {
+         "name" : "Stop netsim devices r01, r02",
+         "cmd-type" : "cli",
+         "cmd-list"  : ["ncs-netsim stop r01", "ncs-netsim stop r02"]
+       },
+       {
+         "name" : "Create New Device Template",
+         "cmd-type" : "load merge",
+         "cmd"  : "merge",
+         "file" :  "DEVICE-TEMPLATE.xml"
+       },
+       {
+         "name" : "Commit Device Template Addition",
+         "cmd-type" : "commit"
+       },
+       {
+         "name" : "Apply Device Template",
+         "cmd-type" : "apply-template",
+         "cmd" : "r01,r02",
+         "cmd-list" : {
+            "template-name" : "TEST",
+            "variable"      :  
+            {
+                "name" : "HOSTNAME",
+                "value": "'TEST'"
+            }
+         }
+       },
+       {
+         "name" : "Commit Changes (A)",
+         "cmd-type" : "commit",
+         "commit" : "commit-queue=async,commit-queue-atomic=true,commit-queue-tag=Template[TEST]",
+         "ops" : ["gather"]
+       },
+       {
+         "name" : "Display Commit Queue(s)",
+         "cmd-type" : "display-cq-active"
+       },    
+       {
+         "name" : "Check commit queue(s)",
+         "cmd-type" : "pause",
+         "cmd"  : "pause",
+         "msg" :  "Verify commit-queue(s) and hit return to continue"
+       },       
+       {
+         "name" : "Start netsim devices r01,r02",
+         "cmd-type" : "cli",
+         "cmd-list"  : ["ncs-netsim start r01", "ncs-netsim start r02"]
+       },
+       {
+         "name" : "Wait for commit queues to drain",
+         "cmd-type" : "commit queue wait"
+       },
+       {
+         "name" : "Display Commit Queue Complete",
+         "cmd-type" : "display-cq-complete"         
+       },
+       {
+         "name" : "Reverse Template Change(s) r01",
+         "cmd-type" : "apply-template",
+         "cmd" : "r01",
+         "cmd-list" : {
+            "template-name" : "TEST",
+            "variable"      :  
+            {
+                "name" : "HOSTNAME",
+                "value": "'r01'"
+            }
+         }
+       },
+       {
+         "name" : "Reverse Template Change(s) r02",
+         "cmd-type" : "apply-template",
+         "cmd" : "r02",
+         "cmd-list" : {
+            "template-name" : "TEST",
+            "variable"      :  
+            {
+                "name" : "HOSTNAME",
+                "value": "'r02'"
+            }
+         }
+       },
+       {
+         "name" : "Remove device Template [TEST]",
+         "cmd-type" : "delete",
+         "cmd"  : "delete",
+         "path" : ["/ncs:devices/template{TEST}"]
+       },
+       {
+         "name" : "Commit Changes (A)",
+         "cmd-type" : "commit"
+       }
+     ]
+}

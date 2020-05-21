@@ -1,0 +1,8 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r01</device>
+  </base-config>
+  <base-config xmlns="http://com/example/baseconfig">
+    <device>r08</device>
+  </base-config>
+</config>
